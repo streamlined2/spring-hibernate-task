@@ -1,5 +1,7 @@
 package com.streamlined.springhibernatetask.entity;
 
+import java.util.Objects;
+
 import org.hibernate.annotations.NaturalId;
 
 import jakarta.persistence.Column;
@@ -29,7 +31,7 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "trainingtype")
-public class TrainingType {
+public class TrainingType implements EntityType<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,5 +47,18 @@ public class TrainingType {
     @ToString.Include
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Override
+    public Long getPrimaryKey() {
+        return getId();
+    }
+
+    @Override
+    public boolean isIdenticalTo(EntityType<Long> entity) {
+        if (entity instanceof TrainingType trainingType) {
+            return Objects.equals(getId(), trainingType.getId()) && Objects.equals(getName(), trainingType.getName());
+        }
+        return false;
+    }
 
 }

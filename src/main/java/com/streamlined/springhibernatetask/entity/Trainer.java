@@ -1,5 +1,7 @@
 package com.streamlined.springhibernatetask.entity;
 
+import java.util.Objects;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -30,5 +32,23 @@ public class Trainer extends User {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @NotNull(message = "Trainer specialization can't be null")
     private TrainingType specialization;
+
+    @Override
+    public Long getPrimaryKey() {
+        return getId();
+    }
+
+    @Override
+    public boolean isIdenticalTo(EntityType<Long> entity) {
+        if (entity instanceof Trainer trainer) {
+            return Objects.equals(getId(), trainer.getId()) && Objects.equals(getFirstName(), trainer.getFirstName())
+                    && Objects.equals(getLastName(), trainer.getLastName())
+                    && Objects.equals(getUserName(), trainer.getUserName())
+                    && Objects.equals(getPasswordHash(), trainer.getPasswordHash())
+                    && Objects.equals(isActive(), trainer.isActive())
+                    && Objects.equals(getSpecialization(), trainer.getSpecialization());
+        }
+        return false;
+    }
 
 }

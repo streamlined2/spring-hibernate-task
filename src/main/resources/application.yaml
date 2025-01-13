@@ -1,0 +1,50 @@
+spring:
+  application:
+    name:
+      springhibernatetask
+    datasource:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:15432/springhibernatetask
+      username: ${USER_NAME}
+      password: ${USER_PASSWORD}
+    liquibase:
+      driver-class-name: org.postgresql.Driver
+      change-log: classpath:db/changelog.xml
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        '[format_sql]': true
+        
+source:
+  csv:
+    trainee=/data/traineestorage.csv
+    trainer=/data/trainerstorage.csv
+    training=/data/trainingstorage.csv
+
+debug: true
+
+logging:
+  level:
+    root:
+      INFO
+    '[com.streamlined.tasks]': INFO
+
+rootLogger:
+  DEBUG, STDOUT
+
+appender:
+  console:
+    type = Console
+    name = STDOUT
+    layout.type = PatternLayout
+    layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
+
+algorithm:
+  random=SHA1PRNG
+
+password:
+  length=10
+  startchar=\u0021
+  endchar=\u007F
+  saltoffset=10

@@ -2,6 +2,7 @@ package com.streamlined.springhibernatetask.entity;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.hibernate.annotations.NaturalId;
 
@@ -38,7 +39,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "training", uniqueConstraints = @UniqueConstraint(columnNames = { "trainee_id", "trainer_id", "date" }))
 @IdClass(TrainingKey.class)
-public class Training {
+public class Training implements EntityType<TrainingKey> {
 
     @EqualsAndHashCode.Include
     @ToString.Include
@@ -77,5 +78,22 @@ public class Training {
     @ToString.Include
     @Column(name = "duration", nullable = false)
     private Duration duration;
+
+    @Override
+    public TrainingKey getPrimaryKey() {
+        return TrainingKey.of(trainerId.getId(), traineeId.getId(), date);
+    }
+
+    @Override
+    public boolean isIdenticalTo(EntityType<TrainingKey> entity) {
+        if (entity instanceof Training training) {
+            return Objects.equals(getTraineeId(), training.getTraineeId())
+                    && Objects.equals(getTrainerId(), training.getTrainerId())
+                    && Objects.equals(getName(), training.getName()) && Objects.equals(getType(), training.getType())
+                    && Objects.equals(getDate(), training.getDate())
+                    && Objects.equals(getDuration(), training.getDuration());
+        }
+        return false;
+    }
 
 }

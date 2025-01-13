@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public abstract class User implements EntityType<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,5 +62,21 @@ public abstract class User {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
+
+    public boolean userNameStartsWith(String firstName, String lastName) {
+        return getUserName().startsWith(getInitialUsername(firstName, lastName));
+    }
+
+    private String getInitialUsername(String firstName, String lastName) {
+        return firstName + "." + lastName;
+    }
+
+    public String getUsernameSerial() {
+        return getUserName().substring(getInitialUsername(firstName, lastName).length());
+    }
+
+    public void setUsernameSerial(String serial) {
+        userName = getInitialUsername(firstName, lastName) + serial;
+    }
 
 }

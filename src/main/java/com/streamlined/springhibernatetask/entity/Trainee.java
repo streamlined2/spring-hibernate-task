@@ -1,6 +1,7 @@
 package com.streamlined.springhibernatetask.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -39,5 +40,24 @@ public class Trainee extends User {
     @Column(name = "address")
     @Length(min = 10, message = "Length of address can't less than 10")
     private @Nullable String address;
+
+    @Override
+    public Long getPrimaryKey() {
+        return getId();
+    }
+
+    @Override
+    public boolean isIdenticalTo(EntityType<Long> entity) {
+        if (entity instanceof Trainee trainee) {
+            return Objects.equals(getId(), trainee.getId()) && Objects.equals(getFirstName(), trainee.getFirstName())
+                    && Objects.equals(getLastName(), trainee.getLastName())
+                    && Objects.equals(getUserName(), trainee.getUserName())
+                    && Objects.equals(getPasswordHash(), trainee.getPasswordHash())
+                    && Objects.equals(isActive(), trainee.isActive())
+                    && Objects.equals(getDateOfBirth(), trainee.getDateOfBirth())
+                    && Objects.equals(getAddress(), trainee.getAddress());
+        }
+        return false;
+    }
 
 }

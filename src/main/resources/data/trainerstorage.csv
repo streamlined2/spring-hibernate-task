@@ -1,0 +1,4 @@
+userId,firstName,lastName,userName,passwordHash,active,specialization
+1,Idris,Powerful,Idris.Powerful,idris,true,Math
+2,Ken,Artful,Ken.Artful,ken,true,Art
+3,Hue,Colorful,Hue.Colorful,hue,true,Computer science
