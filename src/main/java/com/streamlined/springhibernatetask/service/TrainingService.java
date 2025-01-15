@@ -11,7 +11,7 @@ import exception.EntityQueryException;
 
 public interface TrainingService {
 
-    void create(TrainingDto dto) throws EntityCreationException;
+    TrainingDto create(TrainingDto dto) throws EntityCreationException;
 
     Optional<TrainingDto> findById(TrainingKey key) throws EntityQueryException;
 

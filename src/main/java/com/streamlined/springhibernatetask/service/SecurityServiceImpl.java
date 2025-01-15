@@ -1,10 +1,14 @@
 package com.streamlined.springhibernatetask.service;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.streamlined.springhibernatetask.entity.User;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
@@ -45,6 +49,17 @@ public class SecurityServiceImpl implements SecurityService {
             builder.setCharAt(k, c);
         }
         return passwordEncoder.encode(builder);
+    }
+
+    @Override
+    public boolean matches(User user, String userName, char[] password) {
+        String passwordHash = getPasswordHash(password);
+        return Objects.equals(user.getUserName(), userName) && Objects.equals(user.getPasswordHash(), passwordHash);
+    }
+
+    @Override
+    public void clearPassword(char[] password) {
+        Arrays.fill(password, '\u0000');
     }
 
 }

@@ -31,10 +31,10 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional
-    public void create(TrainingDto dto) {
+    public TrainingDto create(TrainingDto dto) {
         try {
             Training training = trainingMapper.toEntity(dto);
-            trainingRepository.save(training);
+            return trainingMapper.toDto(trainingRepository.save(training));
         } catch (Exception e) {
             LOGGER.debug("Error creating training entity", e);
             throw new EntityCreationException("Error creating training entity", e);

@@ -37,7 +37,6 @@ public class TrainingType implements EntityType<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
-    @Setter(AccessLevel.PRIVATE)
     private Long id;
 
     @NotBlank(message = "Training type name should not be blank")

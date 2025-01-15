@@ -53,4 +53,9 @@ public abstract class UserServiceImpl {
         return numeric1 > numeric2 ? value1 : value2;
     }
 
+    protected <T extends User> T changeUserStatus(T user) {
+        user.setActive(!user.isActive());
+        return user;
+    }
+
 }

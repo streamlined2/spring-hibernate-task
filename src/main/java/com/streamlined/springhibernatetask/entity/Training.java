@@ -46,14 +46,14 @@ public class Training implements EntityType<TrainingKey> {
     @JoinColumn(name = "trainee_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Id
-    private Trainee traineeId;
+    private Trainee trainee;
 
     @EqualsAndHashCode.Include
     @ToString.Include
     @JoinColumn(name = "trainer_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Id
-    private Trainer trainerId;
+    private Trainer trainer;
 
     @NotBlank(message = "Training name should not be blank")
     @NotNull(message = "Training name should not be null")
@@ -81,14 +81,14 @@ public class Training implements EntityType<TrainingKey> {
 
     @Override
     public TrainingKey getPrimaryKey() {
-        return TrainingKey.of(trainerId.getId(), traineeId.getId(), date);
+        return TrainingKey.of(trainer.getId(), trainee.getId(), date);
     }
 
     @Override
     public boolean isIdenticalTo(EntityType<TrainingKey> entity) {
         if (entity instanceof Training training) {
-            return Objects.equals(getTraineeId(), training.getTraineeId())
-                    && Objects.equals(getTrainerId(), training.getTrainerId())
+            return Objects.equals(getTrainee(), training.getTrainee())
+                    && Objects.equals(getTrainer(), training.getTrainer())
                     && Objects.equals(getName(), training.getName()) && Objects.equals(getType(), training.getType())
                     && Objects.equals(getDate(), training.getDate())
                     && Objects.equals(getDuration(), training.getDuration());
