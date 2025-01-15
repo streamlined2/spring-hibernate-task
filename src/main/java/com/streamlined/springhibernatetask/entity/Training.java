@@ -19,6 +19,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,7 @@ public class Training implements EntityType<TrainingKey> {
     @NotBlank(message = "Training name should not be blank")
     @NotNull(message = "Training name should not be null")
     @Size(min = 3, message = "Training name should not be shorter than 3 characters")
+    @Pattern(regexp = "^\\p{Upper}\\p{Lower}*$", message = "Training name should start with capital letter and the rest should be lowercase")
     @NaturalId
     @ToString.Include
     @Column(name = "name", nullable = false, unique = true)
