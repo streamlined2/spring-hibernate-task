@@ -83,7 +83,7 @@ public class Training implements EntityType<TrainingKey> {
 
     @Override
     public TrainingKey getPrimaryKey() {
-        return TrainingKey.of(trainer.getId(), trainee.getId(), date);
+        return TrainingKey.of(trainee, trainer, date);
     }
 
     @Override
