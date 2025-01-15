@@ -18,25 +18,21 @@ import exception.EntityDeletionException;
 import exception.EntityQueryException;
 import exception.EntityUpdateException;
 import exception.NoSuchEntityException;
+import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TrainerServiceImpl extends UserServiceImpl implements TrainerService {
 
     private final TrainerMapper trainerMapper;
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final TrainerService trainerService;
-
-    public TrainerServiceImpl(TrainerMapper trainerMapper, TrainingMapper trainingMapper,
-            SecurityService securityService, TrainerService trainerService) {
-        this.trainerMapper = trainerMapper;
-        this.trainingMapper = trainingMapper;
-        this.securityService = securityService;
-        this.trainerService = trainerService;
-    }
+    private final Validator validator;
 
     @Override
     @Transactional
@@ -46,6 +42,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             trainer.setId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainer);
+            ValidationUtilities.checkIfValid(validator, trainer);
             Trainer createdTrainer = trainerRepository.save(trainer);
             securityService.clearPassword(password);
             return trainerMapper.toDto(createdTrainer);
@@ -77,6 +74,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             Trainer newTrainer = trainerMapper.toEntity(dto);
             newTrainer.setPasswordHash(trainer.getPasswordHash());
             newTrainer.setUserName(trainer.getUserName());
+            ValidationUtilities.checkIfValid(validator, newTrainer);
             return trainerMapper.toDto(trainerRepository.save(newTrainer));
         } catch (Exception e) {
             LOGGER.debug("Error updating trainer entity", e);
@@ -91,6 +89,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             Trainer trainer = trainerRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainer entity with id %d".formatted(id)));
             trainer.setPasswordHash(securityService.getPasswordHash(password));
+            ValidationUtilities.checkIfValid(validator, trainer);
             Trainer updatedTrainer = trainerRepository.save(trainerRepository.save(trainer));
             securityService.clearPassword(password);
             return trainerMapper.toDto(updatedTrainer);

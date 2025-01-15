@@ -20,25 +20,21 @@ import exception.EntityDeletionException;
 import exception.EntityQueryException;
 import exception.EntityUpdateException;
 import exception.NoSuchEntityException;
+import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TraineeServiceImpl extends UserServiceImpl implements TraineeService {
 
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final TraineeService traineeService;
-
-    public TraineeServiceImpl(TraineeMapper traineeMapper, TrainingMapper trainingMapper,
-            SecurityService securityService, TraineeService traineeService) {
-        this.traineeMapper = traineeMapper;
-        this.trainingMapper = trainingMapper;
-        this.securityService = securityService;
-        this.traineeService = traineeService;
-    }
+    private final Validator validator;
 
     @Override
     @Transactional
@@ -48,6 +44,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             trainee.setId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainee);
+            ValidationUtilities.checkIfValid(validator, trainee);
             Trainee createdTrainee = traineeRepository.save(trainee);
             securityService.clearPassword(password);
             return traineeMapper.toDto(createdTrainee);
@@ -79,6 +76,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             Trainee newTrainee = traineeMapper.toEntity(dto);
             newTrainee.setPasswordHash(trainee.getPasswordHash());
             newTrainee.setUserName(trainee.getUserName());
+            ValidationUtilities.checkIfValid(validator, newTrainee);
             return traineeMapper.toDto(traineeRepository.save(newTrainee));
         } catch (Exception e) {
             LOGGER.debug("Error updating trainee entity", e);
@@ -93,6 +91,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             Trainee trainee = traineeRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(id)));
             trainee.setPasswordHash(securityService.getPasswordHash(password));
+            ValidationUtilities.checkIfValid(validator, trainee);
             Trainee updatedTrainee = traineeRepository.save(trainee);
             securityService.clearPassword(password);
             return traineeMapper.toDto(updatedTrainee);
