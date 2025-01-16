@@ -1,8 +1,8 @@
 package com.streamlined.springhibernatetask.validator;
 
 import com.streamlined.springhibernatetask.entity.User;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
 
-import exception.InvalidEntityDataException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -10,7 +10,7 @@ public abstract class UserValidator extends EntityValidator {
 
     protected boolean isValid(User entity) {
         try {
-            checkUserId(entity.getId());
+            checkUserId(entity.getUserId());
             checkFirstName(entity.getFirstName());
             checkLastName(entity.getLastName());
             checkUserName(entity.getUserName(), entity.getFirstName(), entity.getLastName());

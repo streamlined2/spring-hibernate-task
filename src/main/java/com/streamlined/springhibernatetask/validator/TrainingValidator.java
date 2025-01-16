@@ -7,8 +7,8 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
 
 import com.streamlined.springhibernatetask.entity.Training;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
 
-import exception.InvalidEntityDataException;
 import lombok.extern.log4j.Log4j2;
 
 @Component
@@ -22,8 +22,8 @@ public class TrainingValidator extends EntityValidator implements Validator<Trai
     @Override
     public boolean isValid(Training training) {
         try {
-            checkUserId(training.getTrainee().getId());
-            checkUserId(training.getTrainer().getId());
+            checkUserId(training.getTrainee().getUserId());
+            checkUserId(training.getTrainer().getUserId());
             checkName(training.getName());
             checkDate(training.getDate());
             checkDuration(training.getDuration());

@@ -5,52 +5,42 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.streamlined.springhibernatetask.entity.User;
-
-import repository.TraineeRepository;
-import repository.TrainerRepository;
+import com.streamlined.springhibernatetask.repository.UserRepository;
 
 public abstract class UserServiceImpl {
 
-    protected TraineeRepository traineeRepository;
-    protected TrainerRepository trainerRepository;
+    protected UserRepository userRepository;
 
     @Autowired
-    void setTraineeRepository(TraineeRepository traineeRepository) {
-        this.traineeRepository = traineeRepository;
-    }
-
-    @Autowired
-    void setTrainerRepository(TrainerRepository trainerRepository) {
-        this.trainerRepository = trainerRepository;
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     protected void setNextUsernameSerial(User user) {
-        Optional<String> serial = getMaxUsernameSerial(user.getFirstName(), user.getLastName());
-        String nextSerial = serial.map(value -> value.isBlank() ? "1" : Long.toString(Long.parseLong(value) + 1))
-                .orElse("");
-        user.setUsernameSerial(nextSerial);
+        Optional<String> serial = getMaxUsernameSerial(user);
+        String nextSerial = getNextSerial(serial);
+        setUsernameSerial(user, nextSerial);
     }
 
-    private Optional<String> getMaxUsernameSerial(String firstName, String lastName) {
-        Optional<String> traineeSerial = traineeRepository.getMaxUsernameSerial(firstName, lastName);
-        Optional<String> trainerSerial = trainerRepository.getMaxUsernameSerial(firstName, lastName);
-        return getMaxSerial(traineeSerial, trainerSerial);
+    private Optional<String> getMaxUsernameSerial(User user) {
+        return userRepository.getMaxUsername(user.getFirstName(), user.getLastName())
+                .map(userName -> getUsernameSerial(user, userName));
     }
 
-    private Optional<String> getMaxSerial(Optional<String> value1, Optional<String> value2) {
-        if (value1.isEmpty())
-            return value2;
-        if (value2.isEmpty())
-            return value1;
-        String serial1 = value1.get();
-        String serial2 = value2.get();
-        if (serial1.isBlank())
-            return value2;
-        if (serial2.isBlank())
-            return value1;
-        long numeric1 = Long.parseLong(serial1);
-        long numeric2 = Long.parseLong(serial2);
-        return numeric1 > numeric2 ? value1 : value2;
+    private String getNextSerial(Optional<String> serial) {
+        return serial.map(value -> value.isBlank() ? "1" : Long.toString(Long.parseLong(value) + 1)).orElse("");
+    }
+
+    private void setUsernameSerial(User user, String serial) {
+        user.setUserName(getInitialUsername(user) + serial);
+    }
+
+    private String getInitialUsername(User user) {
+        return user.getFirstName() + "." + user.getLastName();
+    }
+
+    private String getUsernameSerial(User user, String userName) {
+        return userName.substring(getInitialUsername(user).length());
     }
 
     protected <T extends User> T changeUserStatus(T user) {

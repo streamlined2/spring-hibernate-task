@@ -4,15 +4,14 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.streamlined.springhibernatetask.dto.TraineeCreatedResponse;
+import com.streamlined.springhibernatetask.dto.TraineeDto;
+import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.TrainingType;
-
-import dto.TraineeCreatedResponse;
-import dto.TraineeDto;
-import dto.TrainingDto;
-import exception.EntityCreationException;
-import exception.EntityDeletionException;
-import exception.EntityQueryException;
-import exception.EntityUpdateException;
+import com.streamlined.springhibernatetask.exception.EntityCreationException;
+import com.streamlined.springhibernatetask.exception.EntityDeletionException;
+import com.streamlined.springhibernatetask.exception.EntityQueryException;
+import com.streamlined.springhibernatetask.exception.EntityUpdateException;
 
 public interface TraineeService {
 

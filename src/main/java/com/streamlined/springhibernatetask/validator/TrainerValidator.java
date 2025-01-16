@@ -3,8 +3,8 @@ package com.streamlined.springhibernatetask.validator;
 import org.springframework.stereotype.Component;
 
 import com.streamlined.springhibernatetask.entity.Trainer;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
 
-import exception.InvalidEntityDataException;
 import lombok.extern.log4j.Log4j2;
 
 @Component

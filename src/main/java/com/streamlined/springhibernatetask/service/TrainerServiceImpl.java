@@ -3,21 +3,25 @@ package com.streamlined.springhibernatetask.service;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.streamlined.springhibernatetask.dto.TrainerCreatedResponse;
+import com.streamlined.springhibernatetask.dto.TrainerDto;
+import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Trainer;
+import com.streamlined.springhibernatetask.exception.EntityCreationException;
+import com.streamlined.springhibernatetask.exception.EntityDeletionException;
+import com.streamlined.springhibernatetask.exception.EntityQueryException;
+import com.streamlined.springhibernatetask.exception.EntityUpdateException;
+import com.streamlined.springhibernatetask.exception.NoSuchEntityException;
 import com.streamlined.springhibernatetask.mapper.TrainerMapper;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
+import com.streamlined.springhibernatetask.repository.TrainerRepository;
 
-import dto.TrainerCreatedResponse;
-import dto.TrainerDto;
-import dto.TrainingDto;
-import exception.EntityCreationException;
-import exception.EntityDeletionException;
-import exception.EntityQueryException;
-import exception.EntityUpdateException;
-import exception.NoSuchEntityException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,18 +32,25 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class TrainerServiceImpl extends UserServiceImpl implements TrainerService {
 
+    private final TrainerRepository trainerRepository;
     private final TrainerMapper trainerMapper;
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
-    private final TrainerService trainerService;
     private final Validator validator;
+    private TrainerService trainerService;
+
+    @Autowired
+    @Lazy
+    public void setTrainerService(TrainerService trainerService) {
+        this.trainerService = trainerService;
+    }
 
     @Override
     @Transactional
     public TrainerDto create(TrainerDto dto, char[] password) {
         try {
             Trainer trainer = trainerMapper.toEntity(dto);
-            trainer.setId(null);
+            trainer.setUserId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainer);
             ValidationUtilities.checkIfValid(validator, trainer);

@@ -1,4 +1,4 @@
-package dto;
+package com.streamlined.springhibernatetask.dto;
 
 import java.time.LocalDate;
 import lombok.Builder;

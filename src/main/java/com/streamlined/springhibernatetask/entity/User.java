@@ -39,7 +39,7 @@ public abstract class User implements EntityType<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
-    private Long id;
+    private Long userId;
 
     @NotBlank(message = "User first name should not be blank")
     @NotNull(message = "User first name should not be null")
@@ -65,21 +65,5 @@ public abstract class User implements EntityType<Long> {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
-
-    public boolean userNameStartsWith(String firstName, String lastName) {
-        return getUserName().startsWith(getInitialUsername(firstName, lastName));
-    }
-
-    private String getInitialUsername(String firstName, String lastName) {
-        return firstName + "." + lastName;
-    }
-
-    public String getUsernameSerial() {
-        return getUserName().substring(getInitialUsername(firstName, lastName).length());
-    }
-
-    public void setUsernameSerial(String serial) {
-        userName = getInitialUsername(firstName, lastName) + serial;
-    }
 
 }

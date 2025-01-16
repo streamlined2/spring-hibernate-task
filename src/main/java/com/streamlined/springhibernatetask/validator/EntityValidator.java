@@ -3,7 +3,7 @@ package com.streamlined.springhibernatetask.validator;
 import java.util.HashSet;
 import java.util.Set;
 
-import exception.InvalidEntityDataException;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
 
 public abstract class EntityValidator {
 

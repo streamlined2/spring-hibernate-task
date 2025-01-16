@@ -2,11 +2,10 @@ package com.streamlined.springhibernatetask.mapper;
 
 import org.mapstruct.Mapper;
 
+import com.streamlined.springhibernatetask.dto.TrainingTypeDto;
 import com.streamlined.springhibernatetask.entity.TrainingType;
 
-import dto.TrainingTypeDto;
-
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TrainingTypeMapper {
 
     TrainingType toEntity(TrainingTypeDto dto);

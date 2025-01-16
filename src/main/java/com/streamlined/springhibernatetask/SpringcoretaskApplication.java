@@ -2,10 +2,21 @@ package com.streamlined.springhibernatetask;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @SpringBootApplication
 /* @RequiredArgsConstructor */
 public class SpringcoretaskApplication/* implements CommandLineRunner */ {
+
+    @Bean
+    CsvMapper csvMapper() {
+        CsvMapper csvMapper = new CsvMapper();
+        csvMapper.registerModule(new JavaTimeModule());
+        return csvMapper;
+    }
 
     /*
      * private final Parser parser;

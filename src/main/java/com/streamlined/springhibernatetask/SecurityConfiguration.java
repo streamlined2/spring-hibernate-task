@@ -11,7 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import exception.MissingAlgorithmException;
+import com.streamlined.springhibernatetask.exception.MissingAlgorithmException;
 
 @Configuration
 public class SecurityConfiguration {
@@ -22,7 +22,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    Random random(@Value("${algorithm.random}") String algorithmName) {
+    Random random(@Value("${algorithmname}") String algorithmName) {
         try {
             return SecureRandom.getInstance(algorithmName);
         } catch (NoSuchAlgorithmException e) {

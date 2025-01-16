@@ -1,4 +1,4 @@
-package dto;
+package com.streamlined.springhibernatetask.dto;
 
 import java.time.Duration;
 import java.time.LocalDate;

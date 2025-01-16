@@ -1,4 +1,4 @@
-package repository;
+package com.streamlined.springhibernatetask.repository;
 
 import org.springframework.stereotype.Repository;
 

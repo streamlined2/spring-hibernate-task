@@ -1,8 +1,6 @@
 services:
   postgres:
     image: 'bitnami/postgresql:17.2.0'
-    networks:
-       - app-tier
     environment:
       - 'POSTGRESQL_DATABASE=springhibernatetask'
       - 'POSTGRESQL_PASSWORD=${USER_PASSWORD}'
@@ -11,4 +9,4 @@ services:
     ports:
       - '15432:5432'
     volumes:
-      - 'D:\postgresql:/bitnami/postgresql'
+      - 'D:\springhibernatetask:/bitnami/postgresql'

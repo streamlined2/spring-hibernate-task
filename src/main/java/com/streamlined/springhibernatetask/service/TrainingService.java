@@ -3,11 +3,10 @@ package com.streamlined.springhibernatetask.service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.TrainingKey;
-
-import dto.TrainingDto;
-import exception.EntityCreationException;
-import exception.EntityQueryException;
+import com.streamlined.springhibernatetask.exception.EntityCreationException;
+import com.streamlined.springhibernatetask.exception.EntityQueryException;
 
 public interface TrainingService {
 

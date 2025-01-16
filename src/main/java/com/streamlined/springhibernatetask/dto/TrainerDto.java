@@ -1,10 +1,10 @@
-package dto;
+package com.streamlined.springhibernatetask.dto;
 
 import lombok.Builder;
 
 @Builder
 public record TrainerDto(Long userId, String firstName, String lastName, String userName, boolean isActive,
-        String specialization) {
+        TrainingTypeDto specialization) {
 
     @Override
     public String toString() {

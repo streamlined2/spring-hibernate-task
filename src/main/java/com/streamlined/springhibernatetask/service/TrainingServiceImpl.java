@@ -6,17 +6,17 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Training;
 import com.streamlined.springhibernatetask.entity.TrainingKey;
+import com.streamlined.springhibernatetask.exception.EntityCreationException;
+import com.streamlined.springhibernatetask.exception.EntityQueryException;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
+import com.streamlined.springhibernatetask.repository.TrainingRepository;
 
-import dto.TrainingDto;
-import exception.EntityCreationException;
-import exception.EntityQueryException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import repository.TrainingRepository;
 
 @Service
 @Log4j2

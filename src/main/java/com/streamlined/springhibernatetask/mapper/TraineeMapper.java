@@ -2,11 +2,10 @@ package com.streamlined.springhibernatetask.mapper;
 
 import org.mapstruct.Mapper;
 
+import com.streamlined.springhibernatetask.dto.TraineeDto;
 import com.streamlined.springhibernatetask.entity.Trainee;
 
-import dto.TraineeDto;
-
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TraineeMapper {
 
     Trainee toEntity(TraineeDto dto);

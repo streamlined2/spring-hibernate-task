@@ -1,9 +1,7 @@
-package repository;
+package com.streamlined.springhibernatetask.repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -32,15 +30,6 @@ public interface TrainerRepository extends CrudRepository<Trainer, Long> {
     Streamable<Training> getTrainingListByUserNameDateRangeTraineeNameType(@Param("userName") String userName,
             @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
             @Param("traineeName") String traineeName);
-
-    @Query("""
-            select max(t.getUsernameSerial())
-            from Trainer t
-            where
-                t.firstName=:firstName and
-                t.lastName=:lastName
-            """)
-    Optional<String> getMaxUsernameSerial(@Param("firstName") String firstName, @Param("lastName") String lastName);
 
     @Query("""
             select a

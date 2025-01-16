@@ -1,4 +1,4 @@
-package repository;
+package com.streamlined.springhibernatetask.repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -33,15 +33,6 @@ public interface TraineeRepository extends CrudRepository<Trainee, Long> {
     Streamable<Training> getTrainingListByUserNameDateRangeTrainerNameType(@Param("userName") String userName,
             @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
             @Param("traineeName") String trainerName, @Param("trainingType") TrainingType trainingType);
-
-    @Query("""
-            select max(t.getUsernameSerial())
-            from Trainee t
-            where
-                t.firstName=:firstName and
-                t.lastName=:lastName
-            """)
-    Optional<String> getMaxUsernameSerial(@Param("firstName") String firstName, @Param("lastName") String lastName);
 
     void deleteByUserName(String userName);
 

@@ -4,22 +4,25 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.streamlined.springhibernatetask.dto.TraineeCreatedResponse;
+import com.streamlined.springhibernatetask.dto.TraineeDto;
+import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Trainee;
 import com.streamlined.springhibernatetask.entity.TrainingType;
+import com.streamlined.springhibernatetask.exception.EntityCreationException;
+import com.streamlined.springhibernatetask.exception.EntityDeletionException;
+import com.streamlined.springhibernatetask.exception.EntityQueryException;
+import com.streamlined.springhibernatetask.exception.EntityUpdateException;
+import com.streamlined.springhibernatetask.exception.NoSuchEntityException;
 import com.streamlined.springhibernatetask.mapper.TraineeMapper;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
+import com.streamlined.springhibernatetask.repository.TraineeRepository;
 
-import dto.TraineeCreatedResponse;
-import dto.TraineeDto;
-import dto.TrainingDto;
-import exception.EntityCreationException;
-import exception.EntityDeletionException;
-import exception.EntityQueryException;
-import exception.EntityUpdateException;
-import exception.NoSuchEntityException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,18 +33,25 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class TraineeServiceImpl extends UserServiceImpl implements TraineeService {
 
+    private final TraineeRepository traineeRepository;
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
-    private final TraineeService traineeService;
     private final Validator validator;
+    private TraineeService traineeService;
+
+    @Autowired
+    @Lazy
+    public void setTraineeService(TraineeService traineeService) {
+        this.traineeService = traineeService;
+    }
 
     @Override
     @Transactional
     public TraineeDto create(TraineeDto dto, char[] password) {
         try {
             Trainee trainee = traineeMapper.toEntity(dto);
-            trainee.setId(null);
+            trainee.setUserId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainee);
             ValidationUtilities.checkIfValid(validator, trainee);

@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import org.springframework.stereotype.Component;
 import com.streamlined.springhibernatetask.entity.Trainee;
-import exception.InvalidEntityDataException;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
+
 import lombok.extern.log4j.Log4j2;
 
 @Component

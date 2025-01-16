@@ -1,4 +1,4 @@
-package exception;
+package com.streamlined.springhibernatetask.exception;
 
 import lombok.experimental.StandardException;
 

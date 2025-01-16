@@ -3,7 +3,8 @@ package com.streamlined.springhibernatetask.service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import exception.InvalidEntityDataException;
+import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.experimental.UtilityClass;
