@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+						http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+	<changeSet author="streamlined"
+		id="001.1 fill up trainingtype table">
+		<insert tableName="trainingtype">
+			<column name="name" value="Art" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Mathematics" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Geography" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="History" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Computers" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Biology" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Physics" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Ethics" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Chemistry" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Astronomy" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Mechanics" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Medicine" />
+		</insert>
+		<insert tableName="trainingtype">
+			<column name="name" value="Psychology" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>
