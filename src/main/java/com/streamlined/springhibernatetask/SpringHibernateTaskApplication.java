@@ -1,22 +1,23 @@
 package com.streamlined.springhibernatetask;
 
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.streamlined.springhibernatetask.repository.TrainingTypeRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @SpringBootApplication
-/* @RequiredArgsConstructor */
-public class SpringcoretaskApplication/* implements CommandLineRunner */ {
+@RequiredArgsConstructor
+public class SpringHibernateTaskApplication implements CommandLineRunner {
 
-    @Bean
-    CsvMapper csvMapper() {
-        CsvMapper csvMapper = new CsvMapper();
-        csvMapper.registerModule(new JavaTimeModule());
-        return csvMapper;
-    }
+    private final TrainingTypeRepository trainingTypeRepository;
 
     /*
      * private final Parser parser;
@@ -33,12 +34,28 @@ public class SpringcoretaskApplication/* implements CommandLineRunner */ {
      * final @Value("${source.csv.training}") String trainingFileName; private final
      * TrainingValidator trainingValidator;
      */
+
     public static void main(String[] args) {
-        SpringApplication.run(SpringcoretaskApplication.class, args);
+        SpringApplication.run(SpringHibernateTaskApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        trainingTypeRepository.findAll().forEach(System.out::println);
+
+        System.out.println(trainingTypeRepository.existsById(1L));
+        System.out.println(trainingTypeRepository.existsById(100L));
+
+        System.out.println(trainingTypeRepository.findById(2L));
+        System.out.println(trainingTypeRepository.findById(200L));
+        
+        System.out.println(trainingTypeRepository.count());
+
+        List<Long> ids=List.of(5L, 6L, 7L, 8L, 9L);
+        System.out.println(trainingTypeRepository.findAllById(ids));
     }
 
     /*
-     * @Override public void run(String... args) throws Exception {
      * traineeRepository.deleteAll();
      * traineeRepository.saveAll(parser.parse(Trainee.class, traineeFileName,
      * traineeValidator).values());
@@ -49,6 +66,14 @@ public class SpringcoretaskApplication/* implements CommandLineRunner */ {
      * 
      * trainingRepository.deleteAll();
      * trainingRepository.saveAll(parser.parse(Training.class, trainingFileName,
-     * trainingValidator).values()); }
+     * trainingValidator).values());
      */
+
+    @Bean
+    CsvMapper csvMapper() {
+        CsvMapper csvMapper = new CsvMapper();
+        csvMapper.registerModule(new JavaTimeModule());
+        return csvMapper;
+    }
+
 }
