@@ -11,7 +11,7 @@ public interface UserRepository {
 
     Iterable<User> findAll();
 
-    Optional<User> findById(long l);
+    Optional<User> findById(Long id);
 
     Iterable<User> findAllById(List<Long> ids);
 
