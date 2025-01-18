@@ -22,8 +22,8 @@ public class TrainingValidator extends EntityValidator implements Validator<Trai
     @Override
     public boolean isValid(Training training) {
         try {
-            checkUserId(training.getTrainee().getUserId());
-            checkUserId(training.getTrainer().getUserId());
+            checkUserId(training.getTrainee().getId());
+            checkUserId(training.getTrainer().getId());
             checkName(training.getName());
             checkDate(training.getDate());
             checkDuration(training.getDuration());

@@ -35,13 +35,13 @@ public class Trainer extends User {
 
     @Override
     public Long getPrimaryKey() {
-        return getUserId();
+        return getId();
     }
 
     @Override
     public boolean isIdenticalTo(EntityType<Long> entity) {
         if (entity instanceof Trainer trainer) {
-            return Objects.equals(getUserId(), trainer.getUserId())
+            return Objects.equals(getId(), trainer.getId())
                     && Objects.equals(getFirstName(), trainer.getFirstName())
                     && Objects.equals(getLastName(), trainer.getLastName())
                     && Objects.equals(getUserName(), trainer.getUserName())

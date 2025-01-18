@@ -51,7 +51,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     public TraineeDto create(TraineeDto dto, char[] password) {
         try {
             Trainee trainee = traineeMapper.toEntity(dto);
-            trainee.setUserId(null);
+            trainee.setId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainee);
             ValidationUtilities.checkIfValid(validator, trainee);

@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "user")
+@Table(name = "user_table")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User implements EntityType<Long> {
 
@@ -39,7 +39,7 @@ public abstract class User implements EntityType<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
-    private Long userId;
+    private Long id;
 
     @NotBlank(message = "User first name should not be blank")
     @NotNull(message = "User first name should not be null")

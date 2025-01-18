@@ -9,31 +9,16 @@ import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.streamlined.springhibernatetask.repository.TrainingTypeRepository;
-
+import com.streamlined.springhibernatetask.repository.UserRepository;
+import com.streamlined.springhibernatetask.service.SecurityService;
 import lombok.RequiredArgsConstructor;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 public class SpringHibernateTaskApplication implements CommandLineRunner {
 
-    private final TrainingTypeRepository trainingTypeRepository;
-
-    /*
-     * private final Parser parser;
-     * 
-     * private final TraineeRepository traineeRepository; private
-     * final @Value("${source.csv.trainee}") String traineeFileName; private final
-     * TraineeValidator traineeValidator;
-     * 
-     * private final TrainerRepository trainerRepository; private
-     * final @Value("${source.csv.trainer}") String trainerFileName; private final
-     * TrainerValidator trainerValidator;
-     * 
-     * private final TrainingRepository trainingRepository; private
-     * final @Value("${source.csv.training}") String trainingFileName; private final
-     * TrainingValidator trainingValidator;
-     */
+    private final UserRepository userRepository;
+    private final SecurityService securityService;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringHibernateTaskApplication.class, args);
@@ -41,33 +26,23 @@ public class SpringHibernateTaskApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        trainingTypeRepository.findAll().forEach(System.out::println);
+        userRepository.findAll().forEach(System.out::println);
 
-        System.out.println(trainingTypeRepository.existsById(1L));
-        System.out.println(trainingTypeRepository.existsById(100L));
+        System.out.println(userRepository.existsById(1L));
+        System.out.println(userRepository.existsById(100L));
 
-        System.out.println(trainingTypeRepository.findById(2L));
-        System.out.println(trainingTypeRepository.findById(200L));
-        
-        System.out.println(trainingTypeRepository.count());
+        System.out.println(userRepository.findById(2L));
+        System.out.println(userRepository.findById(200L));
 
-        List<Long> ids=List.of(5L, 6L, 7L, 8L, 9L);
-        System.out.println(trainingTypeRepository.findAllById(ids));
+        System.out.println(userRepository.count());
+
+        List<Long> ids = List.of(5L, 6L, 7L, 8L, 9L);
+        System.out.println(userRepository.findAllById(ids));
+
+        System.out.println(userRepository.getMaxUsername("Robert", "Orwell"));
+
+        System.out.println(securityService.getPasswordHash("password".toCharArray()));
     }
-
-    /*
-     * traineeRepository.deleteAll();
-     * traineeRepository.saveAll(parser.parse(Trainee.class, traineeFileName,
-     * traineeValidator).values());
-     * 
-     * trainerRepository.deleteAll();
-     * trainerRepository.saveAll(parser.parse(Trainer.class, trainerFileName,
-     * trainerValidator).values());
-     * 
-     * trainingRepository.deleteAll();
-     * trainingRepository.saveAll(parser.parse(Training.class, trainingFileName,
-     * trainingValidator).values());
-     */
 
     @Bean
     CsvMapper csvMapper() {

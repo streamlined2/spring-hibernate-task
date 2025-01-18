@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.hibernate.validator.constraints.Length;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -35,21 +34,21 @@ public class Trainee extends User {
     @Past(message = "User birth date should belong to past")
     @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
-    private @Nullable LocalDate dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "address")
     @Length(min = 10, message = "Length of address can't less than 10")
-    private @Nullable String address;
+    private String address;
 
     @Override
     public Long getPrimaryKey() {
-        return getUserId();
+        return getId();
     }
 
     @Override
     public boolean isIdenticalTo(EntityType<Long> entity) {
         if (entity instanceof Trainee trainee) {
-            return Objects.equals(getUserId(), trainee.getUserId()) && Objects.equals(getFirstName(), trainee.getFirstName())
+            return Objects.equals(getId(), trainee.getId()) && Objects.equals(getFirstName(), trainee.getFirstName())
                     && Objects.equals(getLastName(), trainee.getLastName())
                     && Objects.equals(getUserName(), trainee.getUserName())
                     && Objects.equals(getPasswordHash(), trainee.getPasswordHash())

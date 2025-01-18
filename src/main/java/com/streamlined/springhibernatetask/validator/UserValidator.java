@@ -10,7 +10,7 @@ public abstract class UserValidator extends EntityValidator {
 
     protected boolean isValid(User entity) {
         try {
-            checkUserId(entity.getUserId());
+            checkUserId(entity.getId());
             checkFirstName(entity.getFirstName());
             checkLastName(entity.getLastName());
             checkUserName(entity.getUserName(), entity.getFirstName(), entity.getLastName());

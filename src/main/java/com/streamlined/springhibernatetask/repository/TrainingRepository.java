@@ -5,9 +5,8 @@ import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Repository;
 
 import com.streamlined.springhibernatetask.entity.Training;
-import com.streamlined.springhibernatetask.entity.TrainingKey;
 
 @Repository
-public interface TrainingRepository extends CrudRepository<Training, TrainingKey> {
+public interface TrainingRepository extends CrudRepository<Training, Long> {
     Streamable<Training> findAll();
 }

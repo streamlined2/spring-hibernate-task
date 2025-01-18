@@ -50,7 +50,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     public TrainerDto create(TrainerDto dto, char[] password) {
         try {
             Trainer trainer = trainerMapper.toEntity(dto);
-            trainer.setUserId(null);
+            trainer.setId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainer);
             ValidationUtilities.checkIfValid(validator, trainer);

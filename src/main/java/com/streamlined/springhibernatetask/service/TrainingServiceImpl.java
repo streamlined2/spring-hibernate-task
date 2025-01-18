@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Training;
-import com.streamlined.springhibernatetask.entity.TrainingKey;
 import com.streamlined.springhibernatetask.exception.EntityCreationException;
 import com.streamlined.springhibernatetask.exception.EntityQueryException;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
@@ -42,7 +41,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Optional<TrainingDto> findById(TrainingKey key) {
+    public Optional<TrainingDto> findById(Long key) {
         try {
             return trainingRepository.findById(key).map(trainingMapper::toDto);
         } catch (Exception e) {

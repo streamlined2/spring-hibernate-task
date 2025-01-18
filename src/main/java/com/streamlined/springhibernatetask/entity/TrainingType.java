@@ -46,7 +46,7 @@ public class TrainingType implements EntityType<Long> {
     @Pattern(regexp = "^\\p{Upper}\\p{Lower}*$", message = "Training type name should start with capital letter and the rest should be lowercase")
     @NaturalId
     @ToString.Include
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Override
