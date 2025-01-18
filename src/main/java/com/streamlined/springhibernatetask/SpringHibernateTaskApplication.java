@@ -6,6 +6,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import com.streamlined.springhibernatetask.repository.TrainingTypeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -13,6 +15,7 @@ import jakarta.persistence.EntityManagerFactory;
 @Configuration
 @ComponentScan("com.streamlined.springhibernatetask")
 @PropertySource("classpath:application.properties")
+@EnableTransactionManagement
 public class SpringHibernateTaskApplication {
 
     public static void main(String[] args) {
