@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Training;
@@ -19,7 +18,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TrainingServiceImpl implements TrainingService {
 
@@ -28,11 +26,11 @@ public class TrainingServiceImpl implements TrainingService {
     private final Validator validator;
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public TrainingDto create(TrainingDto dto) {
         try {
             Training training = trainingMapper.toEntity(dto);
-            ValidationUtilities.checkIfValid(validator, training);
+            ServiceUtilities.checkIfValid(validator, training);
             return trainingMapper.toDto(trainingRepository.save(training));
         } catch (Exception e) {
             LOGGER.debug("Error creating training entity", e);
@@ -53,7 +51,7 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public Stream<TrainingDto> findAll() {
         try {
-            return trainingRepository.findAll().stream().map(trainingMapper::toDto);
+            return ServiceUtilities.stream(trainingRepository.findAll()).map(trainingMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying training entity", e);
             throw new EntityQueryException("Error querying training entity", e);

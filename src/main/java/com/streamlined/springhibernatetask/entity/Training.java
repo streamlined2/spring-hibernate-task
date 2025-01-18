@@ -13,8 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -30,7 +28,7 @@ import lombok.ToString;
 
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
@@ -70,7 +68,6 @@ public class Training implements EntityType<Long> {
 
     @ToString.Include
     @Column(name = "date", nullable = false)
-    @Temporal(TemporalType.DATE)
     private LocalDate date;
 
     @ToString.Include

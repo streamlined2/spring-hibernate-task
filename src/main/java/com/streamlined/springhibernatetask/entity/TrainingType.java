@@ -2,8 +2,6 @@ package com.streamlined.springhibernatetask.entity;
 
 import java.util.Objects;
 
-import org.hibernate.annotations.NaturalId;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +23,7 @@ import lombok.ToString;
 
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
@@ -44,7 +42,6 @@ public class TrainingType implements EntityType<Long> {
     @NotNull(message = "Training type name should not be null")
     @Size(min = 3, message = "Training type name should not be shorter than 3 characters")
     @Pattern(regexp = "^\\p{Upper}\\p{Lower}*$", message = "Training type name should start with capital letter and the rest should be lowercase")
-    @NaturalId
     @ToString.Include
     @Column(name = "name", nullable = false, unique = true)
     private String name;

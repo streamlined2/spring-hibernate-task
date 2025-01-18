@@ -1,9 +1,15 @@
 package com.streamlined.springhibernatetask.repository;
 
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 import com.streamlined.springhibernatetask.entity.TrainingType;
 
-@Repository
-public interface TrainingTypeRepository extends ReadOnlyRepository<TrainingType, Long> {
+public interface TrainingTypeRepository {
+
+    Optional<TrainingType> findById(Long id);
+
+    Iterable<TrainingType> findAll();
+
+    Iterable<TrainingType> findAllById(Iterable<Long> ids);
+
 }

@@ -1,7 +1,5 @@
 package com.streamlined.springhibernatetask.entity;
 
-import org.hibernate.annotations.NaturalId;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -55,7 +53,6 @@ public abstract class User implements EntityType<Long> {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @NaturalId
     @Pattern(regexp = "^(\\p{Upper}\\p{Lower}*)\\.(\\p{Upper}\\p{Lower}*)\\d*$", message = "User name should consist of first and last name separated by dot and ending with number")
     @Column(name = "user_name", nullable = false, unique = true)
     private String userName;

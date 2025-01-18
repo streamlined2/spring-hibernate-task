@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.streamlined.springhibernatetask.dto.TrainerCreatedResponse;
 import com.streamlined.springhibernatetask.dto.TrainerDto;
@@ -28,7 +27,6 @@ import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TrainerServiceImpl extends UserServiceImpl implements TrainerService {
 
@@ -46,14 +44,14 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     }
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public TrainerDto create(TrainerDto dto, char[] password) {
         try {
             Trainer trainer = trainerMapper.toEntity(dto);
             trainer.setId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
             setNextUsernameSerial(trainer);
-            ValidationUtilities.checkIfValid(validator, trainer);
+            ServiceUtilities.checkIfValid(validator, trainer);
             Trainer createdTrainer = trainerRepository.save(trainer);
             securityService.clearPassword(password);
             return trainerMapper.toDto(createdTrainer);
@@ -77,7 +75,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     }
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public TrainerDto update(TrainerDto dto) {
         try {
             Trainer trainer = trainerRepository.findById(dto.userId()).orElseThrow(
@@ -85,7 +83,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             Trainer newTrainer = trainerMapper.toEntity(dto);
             newTrainer.setPasswordHash(trainer.getPasswordHash());
             newTrainer.setUserName(trainer.getUserName());
-            ValidationUtilities.checkIfValid(validator, newTrainer);
+            ServiceUtilities.checkIfValid(validator, newTrainer);
             return trainerMapper.toDto(trainerRepository.save(newTrainer));
         } catch (Exception e) {
             LOGGER.debug("Error updating trainer entity", e);
@@ -94,13 +92,13 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     }
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public TrainerDto updatePassword(Long id, char[] password) {
         try {
             Trainer trainer = trainerRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainer entity with id %d".formatted(id)));
             trainer.setPasswordHash(securityService.getPasswordHash(password));
-            ValidationUtilities.checkIfValid(validator, trainer);
+            ServiceUtilities.checkIfValid(validator, trainer);
             Trainer updatedTrainer = trainerRepository.save(trainerRepository.save(trainer));
             securityService.clearPassword(password);
             return trainerMapper.toDto(updatedTrainer);
@@ -111,7 +109,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     }
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public void deleteById(Long id) {
         try {
             trainerRepository.deleteById(id);
@@ -134,7 +132,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public Stream<TrainerDto> findAll() {
         try {
-            return trainerRepository.findAll().stream().map(trainerMapper::toDto);
+            return ServiceUtilities.stream(trainerRepository.findAll()).map(trainerMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainer entity", e);
             throw new EntityQueryException("Error querying trainer entity", e);
@@ -152,7 +150,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     }
 
     @Override
-    @Transactional
+    // TODO @Transactional
     public boolean changeActiveStatus(Long id) {
         try {
             Trainer trainer = trainerRepository.findById(id).map(this::changeUserStatus)
@@ -169,9 +167,9 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     public Stream<TrainingDto> getTrainingListByUserNameDateRangeTraineeName(String trainerUserName, LocalDate fromDate,
             LocalDate toDate, String traineeName) throws EntityQueryException {
         try {
-            return trainerRepository
-                    .getTrainingListByUserNameDateRangeTraineeNameType(trainerUserName, fromDate, toDate, traineeName)
-                    .stream().map(trainingMapper::toDto);
+            return ServiceUtilities.stream(trainerRepository
+                    .getTrainingListByUserNameDateRangeTraineeNameType(trainerUserName, fromDate, toDate, traineeName))
+                    .map(trainingMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainer entity", e);
             throw new EntityQueryException("Error querying trainer entity", e);
@@ -180,7 +178,8 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
 
     @Override
     public Stream<TrainerDto> getNonAssignedTrainers(String traineeUserName) {
-        return trainerRepository.getNonAssignedTrainers(traineeUserName).stream().map(trainerMapper::toDto);
+        return ServiceUtilities.stream(trainerRepository.getNonAssignedTrainers(traineeUserName))
+                .map(trainerMapper::toDto);
     }
 
 }

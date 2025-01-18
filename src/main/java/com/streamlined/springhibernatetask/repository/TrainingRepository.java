@@ -1,12 +1,15 @@
 package com.streamlined.springhibernatetask.repository;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.util.Streamable;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 import com.streamlined.springhibernatetask.entity.Training;
 
-@Repository
-public interface TrainingRepository extends CrudRepository<Training, Long> {
-    Streamable<Training> findAll();
+public interface TrainingRepository {
+
+    Iterable<Training> findAll();
+
+    Training save(Training training);
+
+    Optional<Training> findById(Long key);
+
 }

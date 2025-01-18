@@ -2,42 +2,39 @@ package com.streamlined.springhibernatetask;
 
 import java.util.List;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.streamlined.springhibernatetask.repository.UserRepository;
-import com.streamlined.springhibernatetask.service.SecurityService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import com.streamlined.springhibernatetask.repository.TrainingTypeRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
-@SpringBootApplication
-@RequiredArgsConstructor
-public class SpringHibernateTaskApplication implements CommandLineRunner {
-
-    private final UserRepository userRepository;
-    private final SecurityService securityService;
+@Configuration
+@ComponentScan("com.streamlined.springhibernatetask")
+@PropertySource("classpath:application.properties")
+public class SpringHibernateTaskApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringHibernateTaskApplication.class, args);
+        new SpringHibernateTaskApplication().run();
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        userRepository.findAll().forEach(System.out::println);
+    void run() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+                SpringHibernateTaskApplication.class);
+                EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
+                EntityManager entityManager = entityManagerFactory.createEntityManager()) {
 
-        System.out.println(userRepository.existsById(1L));
-        System.out.println(userRepository.existsById(100L));
+            TrainingTypeRepository trainingRepository = context.getBean(TrainingTypeRepository.class);
 
-        System.out.println(userRepository.findById(2L));
-        System.out.println(userRepository.findById(200L));
+            trainingRepository.findAll().forEach(System.out::println);
 
-        System.out.println(userRepository.count());
+            System.out.println(trainingRepository.findById(2L));
+            System.out.println(trainingRepository.findById(200L));
 
-        List<Long> ids = List.of(5L, 6L, 7L, 8L, 9L);
-        System.out.println(userRepository.findAllById(ids));
-
-        System.out.println(userRepository.getMaxUsername("Robert", "Orwell"));
-
-        System.out.println(securityService.getPasswordHash("password".toCharArray()));
+            List<Long> ids = List.of(5L, 6L, 7L, 8L, 9L);
+            System.out.println(trainingRepository.findAllById(ids));
+        }
     }
 
 }

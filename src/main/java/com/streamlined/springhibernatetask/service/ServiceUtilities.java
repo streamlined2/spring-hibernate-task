@@ -2,6 +2,8 @@ package com.streamlined.springhibernatetask.service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import com.streamlined.springhibernatetask.exception.InvalidEntityDataException;
 
@@ -12,7 +14,11 @@ import lombok.extern.log4j.Log4j2;
 
 @UtilityClass
 @Log4j2
-public class ValidationUtilities {
+public class ServiceUtilities {
+
+    public <T> Stream<T> stream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
+    }
 
     public void checkIfValid(Validator validator, Object entity) {
         Set<ConstraintViolation<Object>> violations = validator.validate(entity);
@@ -26,7 +32,7 @@ public class ValidationUtilities {
     }
 
     private <T> String getViolations(Set<ConstraintViolation<T>> violations) {
-        return violations.stream().map(ValidationUtilities::formatViolation).collect(Collectors.joining(",", "[", "]"));
+        return violations.stream().map(ServiceUtilities::formatViolation).collect(Collectors.joining(",", "[", "]"));
     }
 
     private <T> String formatViolation(ConstraintViolation<T> violation) {

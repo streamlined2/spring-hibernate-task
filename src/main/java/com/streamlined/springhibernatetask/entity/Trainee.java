@@ -8,8 +8,6 @@ import org.hibernate.validator.constraints.Length;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Past;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
@@ -33,7 +31,6 @@ public class Trainee extends User {
 
     @Past(message = "User birth date should belong to past")
     @Column(name = "birth_date")
-    @Temporal(TemporalType.DATE)
     private LocalDate dateOfBirth;
 
     @Column(name = "address")
