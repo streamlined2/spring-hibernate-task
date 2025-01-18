@@ -1,8 +1,6 @@
 package com.streamlined.springhibernatetask.repository;
 
 import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.springframework.stereotype.Repository;
 
 import com.streamlined.springhibernatetask.entity.TrainingType;
@@ -37,12 +35,10 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public Iterable<TrainingType> findAllById(Iterable<Long> ids) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            Stream.Builder<TrainingType> streamBuilder = Stream.builder();
-            for (Long id : ids) {
-                TrainingType entity = entityManager.find(TrainingType.class, id);
-                streamBuilder.accept(entity);
-            }
-            return streamBuilder.build().toList();
+            TypedQuery<TrainingType> query = entityManager
+                    .createQuery("select t from TrainingType t where t.id in :idList", TrainingType.class);
+            query.setParameter("idList", ids);
+            return query.getResultList();
         }
     }
 
