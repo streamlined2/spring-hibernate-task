@@ -10,6 +10,6 @@ public interface TrainingRepository {
 
     Training save(Training training);
 
-    Optional<Training> findById(Long key);
+    Optional<Training> findById(Long id);
 
 }
