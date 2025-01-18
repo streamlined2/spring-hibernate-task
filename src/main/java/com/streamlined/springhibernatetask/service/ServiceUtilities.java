@@ -25,7 +25,7 @@ public class ServiceUtilities {
         if (!violations.isEmpty()) {
             String violationDescription = getViolations(violations);
             String entityType = entity.getClass().getSimpleName();
-            LOGGER.error("Incorrect data for type {}: {}", entityType, violationDescription);
+            LOGGER.debug("Incorrect data for type {}: {}", entityType, violationDescription);
             throw new InvalidEntityDataException(
                     "Incorrect data for type %s: %s".formatted(entityType, violationDescription));
         }

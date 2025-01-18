@@ -21,6 +21,7 @@ import com.streamlined.springhibernatetask.mapper.TrainerMapper;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TrainerRepository;
 
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -35,13 +36,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final Validator validator;
-    private TrainerService trainerService;
-
-    @Autowired
-    @Lazy
-    public void setTrainerService(TrainerService trainerService) {
-        this.trainerService = trainerService;
-    }
+    private final EntityManagerFactory entityManagerFactory;
 
     @Override
     // TODO @Transactional
@@ -65,7 +60,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     public TrainerCreatedResponse create(TrainerDto dto) throws EntityCreationException {
         try {
             char[] password = securityService.getNewPassword();
-            TrainerDto createdTrainer = trainerService.create(dto, password);
+            TrainerDto createdTrainer = create(dto, password);
             return TrainerCreatedResponse.builder().userId(createdTrainer.userId()).userName(createdTrainer.userName())
                     .password(password).build();
         } catch (Exception e) {

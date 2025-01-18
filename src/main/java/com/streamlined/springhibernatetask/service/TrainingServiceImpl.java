@@ -12,6 +12,9 @@ import com.streamlined.springhibernatetask.exception.EntityQueryException;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TrainingRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,15 +27,22 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainingMapper trainingMapper;
     private final TrainingRepository trainingRepository;
     private final Validator validator;
+    private final EntityManagerFactory entityManagerFactory;
 
     @Override
-    // TODO @Transactional
     public TrainingDto create(TrainingDto dto) {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             Training training = trainingMapper.toEntity(dto);
             ServiceUtilities.checkIfValid(validator, training);
-            return trainingMapper.toDto(trainingRepository.save(training));
+            Training savedTraining = trainingRepository.save(training);
+            transaction.commit();
+            return trainingMapper.toDto(savedTraining);
         } catch (Exception e) {
+            if (transaction != null)
+                transaction.rollback();
             LOGGER.debug("Error creating training entity", e);
             throw new EntityCreationException("Error creating training entity", e);
         }

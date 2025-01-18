@@ -12,6 +12,7 @@ import com.streamlined.springhibernatetask.dto.TraineeCreatedResponse;
 import com.streamlined.springhibernatetask.dto.TraineeDto;
 import com.streamlined.springhibernatetask.dto.TrainingDto;
 import com.streamlined.springhibernatetask.entity.Trainee;
+import com.streamlined.springhibernatetask.entity.Training;
 import com.streamlined.springhibernatetask.entity.TrainingType;
 import com.streamlined.springhibernatetask.exception.EntityCreationException;
 import com.streamlined.springhibernatetask.exception.EntityDeletionException;
@@ -22,6 +23,7 @@ import com.streamlined.springhibernatetask.mapper.TraineeMapper;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TraineeRepository;
 
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,13 +38,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final Validator validator;
-    private TraineeService traineeService;
-
-    @Autowired
-    @Lazy
-    public void setTraineeService(TraineeService traineeService) {
-        this.traineeService = traineeService;
-    }
+    private final EntityManagerFactory entityManagerFactory;
 
     @Override
     // TODO @Transactional
@@ -66,7 +62,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     public TraineeCreatedResponse create(TraineeDto dto) throws EntityCreationException {
         try {
             char[] password = securityService.getNewPassword();
-            TraineeDto createdTrainee = traineeService.create(dto, password);
+            TraineeDto createdTrainee = create(dto, password);
             return TraineeCreatedResponse.builder().userId(createdTrainee.userId()).userName(createdTrainee.userName())
                     .password(password).build();
         } catch (Exception e) {
@@ -179,10 +175,9 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             LocalDate fromDate, LocalDate toDate, String trainerName, TrainingType trainingType)
             throws EntityQueryException {
         try {
-            return ServiceUtilities
-                    .stream(traineeRepository.getTrainingListByUserNameDateRangeTrainerNameType(traineeUserName,
-                            fromDate, toDate, trainerName, trainingType))
-                    .map(trainingMapper::toDto);
+            Iterable<Training> trainings = traineeRepository.getTrainingListByUserNameDateRangeTrainerNameType(
+                    traineeUserName, fromDate, toDate, trainerName, trainingType);
+            return ServiceUtilities.stream(trainings).map(trainingMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainee entity", e);
             throw new EntityQueryException("Error querying trainee entity", e);
