@@ -5,10 +5,6 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.streamlined.springhibernatetask.repository.UserRepository;
 import com.streamlined.springhibernatetask.service.SecurityService;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +38,6 @@ public class SpringHibernateTaskApplication implements CommandLineRunner {
         System.out.println(userRepository.getMaxUsername("Robert", "Orwell"));
 
         System.out.println(securityService.getPasswordHash("password".toCharArray()));
-    }
-
-    @Bean
-    CsvMapper csvMapper() {
-        CsvMapper csvMapper = new CsvMapper();
-        csvMapper.registerModule(new JavaTimeModule());
-        return csvMapper;
     }
 
 }

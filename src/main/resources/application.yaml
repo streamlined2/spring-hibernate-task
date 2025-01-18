@@ -15,15 +15,6 @@ spring:
     properties:
       hibernate:
         '[format_sql]': true
-        
-source:
-  csv:
-    trainee:
-      '[/data/traineestorage.csv]'
-    trainer:
-      '[/data/trainerstorage.csv]'
-    training:
-      '[/data/trainingstorage.csv]'
 
 debug: true
 

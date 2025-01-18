@@ -1,6 +1,0 @@
-userId,firstName,lastName,userName,passwordHash,active,dateOfBirth,address
-1,John,Smith,John.Smith,john,true,"1990-01-01",USA
-2,Jack,Powell,Jack.Powell,jack,true,"1990-02-15",UK
-3,Robert,Orwell,Robert.Orwell,robert,true,"1991-03-10",UK
-4,Ingrid,Kin,Ingrid.Kin,ingrid,true,"1989-04-12",Norway
-5,Kyle,Stark,Kyle.Stark,kyle,true,"1988-05-18",USA
