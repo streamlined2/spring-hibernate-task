@@ -20,7 +20,7 @@ public interface TraineeRepository {
 
     Trainee save(Trainee trainee);
 
-    Optional<Trainee> findById(Long userId);
+    Optional<Trainee> findById(Long id);
 
     void deleteById(Long id);
 

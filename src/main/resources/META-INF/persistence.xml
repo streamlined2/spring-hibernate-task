@@ -1,8 +1,9 @@
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0"
 	xsi:schemalocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
-	<persistence-unit name="springhibernatetask">
+	<persistence-unit name="springhibernatetask" transaction-type="RESOURCE_LOCAL">
 		<description>Spring Hibernate Task</description>
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<class>com.streamlined.springhibernatetask.entity.Trainee</class>
 		<class>com.streamlined.springhibernatetask.entity.Trainer</class>
 		<class>com.streamlined.springhibernatetask.entity.Training</class>
@@ -16,10 +17,6 @@
 				value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.url"
 				value="jdbc:postgresql://localhost:15432/springhibernatetask" />
-			<property name="javax.persistence.jdbc.user"
-				value="postgres" />
-			<property name="javax.persistence.jdbc.password"
-				value="secret" />
 		</properties>
 	</persistence-unit>
 </persistence>
