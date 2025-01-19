@@ -1,4 +1,4 @@
-package com.streamlined.springhibernatetask.service;
+package com.streamlined.springhibernatetask;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 
 @UtilityClass
 @Log4j2
-public class ServiceUtilities {
+public class Utilities {
 
     public <T> Stream<T> stream(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
@@ -32,12 +32,12 @@ public class ServiceUtilities {
     }
 
     private <T> String getViolations(Set<ConstraintViolation<T>> violations) {
-        return violations.stream().map(ServiceUtilities::formatViolation).collect(Collectors.joining(",", "[", "]"));
+        return violations.stream().map(Utilities::formatViolation).collect(Collectors.joining(",", "[", "]"));
     }
 
     private <T> String formatViolation(ConstraintViolation<T> violation) {
         return "Error %s: property '%s' has invalid value '%s'".formatted(violation.getMessage(),
                 violation.getPropertyPath(), violation.getInvalidValue());
     }
-
+    
 }

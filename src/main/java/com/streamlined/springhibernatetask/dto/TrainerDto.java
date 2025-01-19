@@ -32,7 +32,7 @@ public record TrainerDto(
 
     @Override
     public String toString() {
-        return "TrainerDto{userId=%d}".formatted(id());
+        return "TrainerDto{id=%d}".formatted(id());
     }
 
 }

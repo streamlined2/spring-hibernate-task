@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
+import com.streamlined.springhibernatetask.EntityManagerStorage;
+import com.streamlined.springhibernatetask.Utilities;
 import com.streamlined.springhibernatetask.dto.TrainerCreatedResponse;
 import com.streamlined.springhibernatetask.dto.TrainerDto;
 import com.streamlined.springhibernatetask.dto.TrainingDto;
@@ -21,7 +23,6 @@ import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TrainerRepository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,13 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final Validator validator;
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManagerStorage entityManagerStorage;
 
     @Override
     public TrainerDto create(TrainerDto dto, char[] password) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            ServiceUtilities.checkIfValid(validator, dto);
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            Utilities.checkIfValid(validator, dto);
             Trainer trainer = trainerMapper.toEntity(dto);
             trainer.setId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
@@ -78,8 +79,8 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public TrainerDto update(TrainerDto dto) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            ServiceUtilities.checkIfValid(validator, dto);
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            Utilities.checkIfValid(validator, dto);
             Trainer newTrainer = trainerMapper.toEntity(dto);
             transaction = entityManager.getTransaction();
             transaction.begin();
@@ -101,7 +102,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public TrainerDto updatePassword(Long id, char[] password) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainer trainer = trainerRepository.findById(id)
@@ -122,7 +123,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public void deleteById(Long id) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             trainerRepository.deleteById(id);
@@ -148,7 +149,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public Stream<TrainerDto> findAll() {
         try {
-            return ServiceUtilities.stream(trainerRepository.findAll()).map(trainerMapper::toDto);
+            return Utilities.stream(trainerRepository.findAll()).map(trainerMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainer entity", e);
             throw new EntityQueryException("Error querying trainer entity", e);
@@ -168,7 +169,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public boolean changeActiveStatus(Long id) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainer trainer = trainerRepository.findById(id).map(this::changeUserStatus)
@@ -190,7 +191,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
         try {
             Iterable<Training> trainings = trainerRepository
                     .getTrainingListByUserNameDateRangeTraineeNameType(trainerUserName, fromDate, toDate, traineeName);
-            return ServiceUtilities.stream(trainings).map(trainingMapper::toDto);
+            return Utilities.stream(trainings).map(trainingMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainer entity", e);
             throw new EntityQueryException("Error querying trainer entity", e);
@@ -200,7 +201,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     @Override
     public Stream<TrainerDto> getNonAssignedTrainers(String traineeUserName) {
         Iterable<Trainer> trainers = trainerRepository.getNonAssignedTrainers(traineeUserName);
-        return ServiceUtilities.stream(trainers).map(trainerMapper::toDto);
+        return Utilities.stream(trainers).map(trainerMapper::toDto);
     }
 
 }

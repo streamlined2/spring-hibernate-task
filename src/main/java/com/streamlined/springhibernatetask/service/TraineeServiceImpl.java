@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
+import com.streamlined.springhibernatetask.EntityManagerStorage;
+import com.streamlined.springhibernatetask.Utilities;
 import com.streamlined.springhibernatetask.dto.TraineeCreatedResponse;
 import com.streamlined.springhibernatetask.dto.TraineeDto;
 import com.streamlined.springhibernatetask.dto.TrainingDto;
@@ -22,7 +24,6 @@ import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TraineeRepository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +39,13 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     private final TrainingMapper trainingMapper;
     private final SecurityService securityService;
     private final Validator validator;
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManagerStorage entityManagerStorage;
 
     @Override
     public TraineeDto create(TraineeDto dto, char[] password) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            ServiceUtilities.checkIfValid(validator, dto);
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            Utilities.checkIfValid(validator, dto);
             Trainee trainee = traineeMapper.toEntity(dto);
             trainee.setId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
@@ -79,8 +80,8 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public TraineeDto update(TraineeDto dto) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            ServiceUtilities.checkIfValid(validator, dto);
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            Utilities.checkIfValid(validator, dto);
             Trainee newTrainee = traineeMapper.toEntity(dto);
             transaction = entityManager.getTransaction();
             transaction.begin();
@@ -102,7 +103,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public TraineeDto updatePassword(Long id, char[] password) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainee trainee = traineeRepository.findById(id)
@@ -123,7 +124,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public void deleteById(Long id) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             traineeRepository.deleteById(id);
@@ -139,7 +140,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public void deleteByUserName(String userName) throws EntityDeletionException {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             traineeRepository.deleteByUserName(userName);
@@ -165,7 +166,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public Stream<TraineeDto> findAll() {
         try {
-            return ServiceUtilities.stream(traineeRepository.findAll()).map(traineeMapper::toDto);
+            return Utilities.stream(traineeRepository.findAll()).map(traineeMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainee entity", e);
             throw new EntityQueryException("Error querying trainee entity", e);
@@ -185,7 +186,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     @Override
     public boolean changeActiveStatus(Long id) {
         EntityTransaction transaction = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainee trainee = traineeRepository.findById(id).map(this::changeUserStatus)
@@ -208,7 +209,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
         try {
             Iterable<Training> trainings = traineeRepository.getTrainingListByUserNameDateRangeTrainerNameType(
                     traineeUserName, fromDate, toDate, trainerName, trainingType);
-            return ServiceUtilities.stream(trainings).map(trainingMapper::toDto);
+            return Utilities.stream(trainings).map(trainingMapper::toDto);
         } catch (Exception e) {
             LOGGER.debug("Error querying trainee entity", e);
             throw new EntityQueryException("Error querying trainee entity", e);
