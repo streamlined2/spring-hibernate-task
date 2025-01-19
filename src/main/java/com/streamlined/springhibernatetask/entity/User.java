@@ -27,20 +27,20 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "user_table")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User implements EntityType<Long> {
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
-        
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
-    
+
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    
+
     @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
 

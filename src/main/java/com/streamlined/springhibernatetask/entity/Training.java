@@ -2,8 +2,6 @@ package com.streamlined.springhibernatetask.entity;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +29,7 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "training")
-public class Training implements EntityType<Long> {
+public class Training {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,22 +63,5 @@ public class Training implements EntityType<Long> {
     @ToString.Include
     @Column(name = "duration", nullable = false)
     private Duration duration;
-
-    @Override
-    public Long getPrimaryKey() {
-        return getId();
-    }
-
-    @Override
-    public boolean isIdenticalTo(EntityType<Long> entity) {
-        if (entity instanceof Training training) {
-            return Objects.equals(getTrainee(), training.getTrainee())
-                    && Objects.equals(getTrainer(), training.getTrainer())
-                    && Objects.equals(getName(), training.getName()) && Objects.equals(getType(), training.getType())
-                    && Objects.equals(getDate(), training.getDate())
-                    && Objects.equals(getDuration(), training.getDuration());
-        }
-        return false;
-    }
 
 }

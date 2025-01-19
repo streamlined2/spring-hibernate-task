@@ -1,8 +1,6 @@
 package com.streamlined.springhibernatetask.entity;
 
 import java.time.LocalDate;
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -31,24 +29,5 @@ public class Trainee extends User {
 
     @Column(name = "address")    
     private String address;
-
-    @Override
-    public Long getPrimaryKey() {
-        return getId();
-    }
-
-    @Override
-    public boolean isIdenticalTo(EntityType<Long> entity) {
-        if (entity instanceof Trainee trainee) {
-            return Objects.equals(getId(), trainee.getId()) && Objects.equals(getFirstName(), trainee.getFirstName())
-                    && Objects.equals(getLastName(), trainee.getLastName())
-                    && Objects.equals(getUserName(), trainee.getUserName())
-                    && Objects.equals(getPasswordHash(), trainee.getPasswordHash())
-                    && Objects.equals(isActive(), trainee.isActive())
-                    && Objects.equals(getDateOfBirth(), trainee.getDateOfBirth())
-                    && Objects.equals(getAddress(), trainee.getAddress());
-        }
-        return false;
-    }
 
 }
