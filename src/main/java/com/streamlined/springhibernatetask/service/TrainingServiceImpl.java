@@ -33,17 +33,17 @@ public class TrainingServiceImpl implements TrainingService {
     public TrainingDto create(TrainingDto dto) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            transaction = entityManager.getTransaction();
-            transaction.begin();
             Training training = trainingMapper.toEntity(dto);
             ServiceUtilities.checkIfValid(validator, training);
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             Training savedTraining = trainingRepository.save(training);
             transaction.commit();
             return trainingMapper.toDto(savedTraining);
         } catch (Exception e) {
+            LOGGER.debug("Error creating training entity", e);
             if (transaction != null)
                 transaction.rollback();
-            LOGGER.debug("Error creating training entity", e);
             throw new EntityCreationException("Error creating training entity", e);
         }
     }

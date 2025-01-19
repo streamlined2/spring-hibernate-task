@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.streamlined.springhibernatetask.dto.TraineeCreatedResponse;
@@ -23,7 +21,9 @@ import com.streamlined.springhibernatetask.mapper.TraineeMapper;
 import com.streamlined.springhibernatetask.mapper.TrainingMapper;
 import com.streamlined.springhibernatetask.repository.TraineeRepository;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -41,19 +41,24 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     private final EntityManagerFactory entityManagerFactory;
 
     @Override
-    // TODO @Transactional
     public TraineeDto create(TraineeDto dto, char[] password) {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             Trainee trainee = traineeMapper.toEntity(dto);
+            ServiceUtilities.checkIfValid(validator, trainee);
             trainee.setId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             setNextUsernameSerial(trainee);
-            ServiceUtilities.checkIfValid(validator, trainee);
             Trainee createdTrainee = traineeRepository.save(trainee);
+            transaction.commit();
             securityService.clearPassword(password);
             return traineeMapper.toDto(createdTrainee);
         } catch (Exception e) {
             LOGGER.debug("Error creating trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityCreationException("Error creating trainee entity", e);
         }
     }
@@ -63,7 +68,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
         try {
             char[] password = securityService.getNewPassword();
             TraineeDto createdTrainee = create(dto, password);
-            return TraineeCreatedResponse.builder().userId(createdTrainee.userId()).userName(createdTrainee.userName())
+            return TraineeCreatedResponse.builder().id(createdTrainee.id()).userName(createdTrainee.userName())
                     .password(password).build();
         } catch (Exception e) {
             LOGGER.debug("Error creating trainee entity", e);
@@ -72,56 +77,77 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     }
 
     @Override
-    // TODO @Transactional
     public TraineeDto update(TraineeDto dto) {
-        try {
-            Trainee trainee = traineeRepository.findById(dto.userId()).orElseThrow(
-                    () -> new NoSuchEntityException("No trainee entity with id %d".formatted(dto.userId())));
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             Trainee newTrainee = traineeMapper.toEntity(dto);
+            ServiceUtilities.checkIfValid(validator, newTrainee);
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+            Trainee trainee = traineeRepository.findById(dto.id())
+                    .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(dto.id())));
             newTrainee.setPasswordHash(trainee.getPasswordHash());
             newTrainee.setUserName(trainee.getUserName());
-            ServiceUtilities.checkIfValid(validator, newTrainee);
-            return traineeMapper.toDto(traineeRepository.save(newTrainee));
+            Trainee savedTrainee = traineeRepository.save(newTrainee);
+            transaction.commit();
+            return traineeMapper.toDto(savedTrainee);
         } catch (Exception e) {
             LOGGER.debug("Error updating trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityUpdateException("Error updating trainee entity", e);
         }
     }
 
     @Override
-    // TODO @Transactional
     public TraineeDto updatePassword(Long id, char[] password) {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             Trainee trainee = traineeRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(id)));
             trainee.setPasswordHash(securityService.getPasswordHash(password));
-            ServiceUtilities.checkIfValid(validator, trainee);
             Trainee updatedTrainee = traineeRepository.save(trainee);
+            transaction.commit();
             securityService.clearPassword(password);
             return traineeMapper.toDto(updatedTrainee);
         } catch (Exception e) {
             LOGGER.debug("Error updating password for trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityUpdateException("Error updating password for trainee entity", e);
         }
     }
 
     @Override
-    // TODO @Transactional
     public void deleteById(Long id) {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             traineeRepository.deleteById(id);
+            transaction.commit();
         } catch (Exception e) {
             LOGGER.debug("Error deleting trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityDeletionException("Error deleting trainee entity", e);
         }
     }
 
     @Override
     public void deleteByUserName(String userName) throws EntityDeletionException {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             traineeRepository.deleteByUserName(userName);
+            transaction.commit();
         } catch (Exception e) {
             LOGGER.debug("Error deleting trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityDeletionException("Error deleting trainee entity", e);
         }
     }
@@ -157,15 +183,20 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     }
 
     @Override
-    // TODO @Transactional
     public boolean changeActiveStatus(Long id) {
-        try {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
             Trainee trainee = traineeRepository.findById(id).map(this::changeUserStatus)
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(id)));
-            traineeRepository.save(trainee);
-            return trainee.isActive();
+            Trainee savedTrainee = traineeRepository.save(trainee);
+            transaction.commit();
+            return savedTrainee.isActive();
         } catch (Exception e) {
             LOGGER.debug("Error querying trainee entity", e);
+            if (transaction != null)
+                transaction.rollback();
             throw new EntityQueryException("Error querying trainee entity", e);
         }
     }

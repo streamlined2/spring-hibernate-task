@@ -3,11 +3,11 @@ package com.streamlined.springhibernatetask.dto;
 import lombok.Builder;
 
 @Builder
-public record TrainerCreatedResponse(Long userId, String userName, char[] password) {
+public record TrainerCreatedResponse(Long id, String userName, char[] password) {
 
     @Override
     public String toString() {
-        return "TrainerCreatedResponse{userId=%d}".formatted(userId());
+        return "TrainerCreatedResponse{userId=%d}".formatted(id());
     }
 
 }
