@@ -33,8 +33,8 @@ public class TrainingServiceImpl implements TrainingService {
     public TrainingDto create(TrainingDto dto) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            ServiceUtilities.checkIfValid(validator, dto);
             Training training = trainingMapper.toEntity(dto);
-            ServiceUtilities.checkIfValid(validator, training);
             transaction = entityManager.getTransaction();
             transaction.begin();
             Training savedTraining = trainingRepository.save(training);

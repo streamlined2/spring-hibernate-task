@@ -8,10 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,11 +33,7 @@ public class TrainingType implements EntityType<Long> {
     @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
-
-    @NotBlank(message = "Training type name should not be blank")
-    @NotNull(message = "Training type name should not be null")
-    @Size(min = 3, message = "Training type name should not be shorter than 3 characters")
-    @Pattern(regexp = "^\\p{Upper}\\p{Lower}*$", message = "Training type name should start with capital letter and the rest should be lowercase")
+    
     @ToString.Include
     @Column(name = "name", nullable = false, unique = true)
     private String name;

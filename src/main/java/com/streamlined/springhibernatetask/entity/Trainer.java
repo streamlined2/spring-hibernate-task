@@ -3,11 +3,9 @@ package com.streamlined.springhibernatetask.entity;
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -29,8 +27,7 @@ import lombok.experimental.SuperBuilder;
 public class Trainer extends User {
 
     @JoinColumn(name = "specialization", nullable = false)
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @NotNull(message = "Trainer specialization can't be null")
+    @ManyToOne(optional = false)    
     private TrainingType specialization;
 
     @Override

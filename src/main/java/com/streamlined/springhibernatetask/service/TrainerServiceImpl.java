@@ -43,8 +43,8 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     public TrainerDto create(TrainerDto dto, char[] password) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            ServiceUtilities.checkIfValid(validator, dto);
             Trainer trainer = trainerMapper.toEntity(dto);
-            ServiceUtilities.checkIfValid(validator, trainer);
             trainer.setId(null);
             trainer.setPasswordHash(securityService.getPasswordHash(password));
             transaction = entityManager.getTransaction();
@@ -79,8 +79,8 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
     public TrainerDto update(TrainerDto dto) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            ServiceUtilities.checkIfValid(validator, dto);
             Trainer newTrainer = trainerMapper.toEntity(dto);
-            ServiceUtilities.checkIfValid(validator, newTrainer);
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainer trainer = trainerRepository.findById(dto.id())

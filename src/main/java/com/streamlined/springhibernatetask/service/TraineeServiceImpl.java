@@ -44,8 +44,8 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     public TraineeDto create(TraineeDto dto, char[] password) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            ServiceUtilities.checkIfValid(validator, dto);
             Trainee trainee = traineeMapper.toEntity(dto);
-            ServiceUtilities.checkIfValid(validator, trainee);
             trainee.setId(null);
             trainee.setPasswordHash(securityService.getPasswordHash(password));
             transaction = entityManager.getTransaction();
@@ -80,8 +80,8 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
     public TraineeDto update(TraineeDto dto) {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            ServiceUtilities.checkIfValid(validator, dto);
             Trainee newTrainee = traineeMapper.toEntity(dto);
-            ServiceUtilities.checkIfValid(validator, newTrainee);
             transaction = entityManager.getTransaction();
             transaction.begin();
             Trainee trainee = traineeRepository.findById(dto.id())
