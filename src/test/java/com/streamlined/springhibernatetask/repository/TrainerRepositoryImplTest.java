@@ -1,9 +1,12 @@
 package com.streamlined.springhibernatetask.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.streamlined.springhibernatetask.EntityManagerStorage;
 import com.streamlined.springhibernatetask.SpringHibernateTaskApplication;
 import com.streamlined.springhibernatetask.Utilities;
+import com.streamlined.springhibernatetask.entity.Trainee;
 import com.streamlined.springhibernatetask.entity.Trainer;
 import com.streamlined.springhibernatetask.entity.TrainingType;
 
@@ -104,6 +108,52 @@ class TrainerRepositoryImplTest {
     private String getTrainerKey(Trainer a) {
         return "%s%s%s%s%b%d".formatted(a.getFirstName(), a.getLastName(), a.getUserName(), a.getPasswordHash(),
                 a.isActive(), a.getSpecialization().getId());
+    }
+
+    @Test
+    void findByUserNameShouldReturnEmptyOptional_ifPassedUserNameDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            String nonExistingUserName = "John.Smith";
+            Optional<Trainer> trainer = trainerRepository.findByUserName(nonExistingUserName);
+
+            assertTrue(trainer.isEmpty());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void findByUserNameShouldReturnFoundTrainer_ifPassedUserNameExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String existingUserName = "John.Smith";
+            Trainer trainer = Trainer.builder().firstName("John").lastName("Smith").userName(existingUserName)
+                    .passwordHash("john").isActive(true).specialization(TrainingType.builder().id(7L).build()).build();
+            trainer = trainerRepository.create(trainer);
+
+            Optional<Trainer> foundTrainer = trainerRepository.findByUserName(existingUserName);
+
+            assertTrue(foundTrainer.isPresent());
+            assertEquals(getTrainerKey(trainer), getTrainerKey(foundTrainer.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
     }
 
 }
