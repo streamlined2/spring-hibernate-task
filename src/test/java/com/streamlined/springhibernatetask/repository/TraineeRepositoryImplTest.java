@@ -150,6 +150,62 @@ class TraineeRepositoryImplTest {
     }
 
     @Test
+    void deleteByUserNameShouldDoNothing_ifPassedUserNameDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String existingUserName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(existingUserName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            String nonExistingUserName = "Jack.Welsh";
+            traineeRepository.deleteByUserName(nonExistingUserName);
+
+            Optional<Trainee> existingTrainee = traineeRepository.findByUserName(existingUserName);
+            Optional<Trainee> nonExistingTrainee = traineeRepository.findByUserName(nonExistingUserName);
+
+            assertTrue(nonExistingTrainee.isEmpty());
+            assertTrue(existingTrainee.isPresent());
+            assertEquals(getTraineeKey(trainee), getTraineeKey(existingTrainee.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void deleteByUserNameShouldDeleteFoundEntity_ifPassedUserNameExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            traineeRepository.deleteByUserName(userName);
+
+            Optional<Trainee> deletedTrainee = traineeRepository.findByUserName(userName);
+
+            assertTrue(deletedTrainee.isEmpty());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    @Test
     void testGetTrainingListByUserNameDateRangeTrainerNameType() {
         fail("Not yet implemented"); // TODO
     }
