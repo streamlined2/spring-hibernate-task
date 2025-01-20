@@ -1,6 +1,7 @@
 package com.streamlined.springhibernatetask.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -358,6 +360,60 @@ class TrainerRepositoryImplTest {
 
     private boolean isEmptyTable() {
         return !trainerRepository.findAll().iterator().hasNext();
+    }
+
+    @Test
+    void createShouldCreateNewEntity_ifSucceeds() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName("Jack.Powell")
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            Optional<Trainer> foundTrainer = trainerRepository.findById(trainer.getId());
+
+            assertTrue(foundTrainer.isPresent());
+            assertEquals(getTrainerKey(trainer), getTrainerKey(foundTrainer.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void createShouldNotCreateNewEntityAndThrowException_ifPassedUserNameAlreadyExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            String userName = "Jack.Powell";
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName(userName)
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            Trainer newTrainer = Trainer.builder().firstName("London").lastName("Robertson").userName(userName)
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            Exception exc = assertThrows(ConstraintViolationException.class,
+                    () -> trainerRepository.create(newTrainer));
+            assertTrue(exc.getMessage().contains("duplicate key value violates unique constraint"));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.setRollbackOnly();
+        }
     }
 
 }
