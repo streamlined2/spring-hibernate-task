@@ -264,4 +264,51 @@ class TrainerRepositoryImplTest {
         return entityManager.createQuery(criteria).executeUpdate();
     }
 
+    @Test
+    void findByIdShouldReturnEmptyTrainerEntity_ifEntityWithPassedIdDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+
+            Long nonExistingId = -1L;
+            Optional<Trainer> trainer = trainerRepository.findById(nonExistingId);
+
+            assertTrue(trainer.isEmpty());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void findByIdShouldReturnFoundTrainerEntity_ifEntityWithPassedIdExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName("Jack.Powell")
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            Optional<Trainer> foundTrainer = trainerRepository.findById(trainer.getId());
+
+            assertTrue(foundTrainer.isPresent());
+            assertEquals(getTrainerKey(trainer), getTrainerKey(foundTrainer.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
 }
