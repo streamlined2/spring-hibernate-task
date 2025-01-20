@@ -106,7 +106,9 @@ class TraineeRepositoryImplTest {
     }
 
     private void saveAll(Iterable<Trainee> trainees) {
-        trainees.forEach(traineeRepository::create);
+        for (Trainee trainee : trainees) {
+            traineeRepository.create(trainee);
+        }
     }
 
     private String getTraineeKey(Trainee a) {
