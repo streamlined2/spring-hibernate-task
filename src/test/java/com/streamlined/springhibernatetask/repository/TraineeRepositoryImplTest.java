@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -89,7 +90,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -119,7 +120,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -144,7 +145,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -174,7 +175,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -200,7 +201,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -221,7 +222,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -247,7 +248,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -268,7 +269,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -291,7 +292,7 @@ class TraineeRepositoryImplTest {
         } catch (Exception e) {
             fail("Exception executing test: ", e);
         } finally {
-            if (transaction != null)
+            if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
     }
@@ -299,4 +300,56 @@ class TraineeRepositoryImplTest {
     private boolean isEmptyTable() {
         return !traineeRepository.findAll().iterator().hasNext();
     }
+
+    @Test
+    void createShouldCreateNewEntity_ifSucceeds() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName("John.Smith")
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            Optional<Trainee> foundTrainee = traineeRepository.findById(trainee.getId());
+
+            assertTrue(foundTrainee.isPresent());
+            assertEquals(getTraineeKey(trainee), getTraineeKey(foundTrainee.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void createShouldNotCreateNewEntityAndThrowException_ifPassedUserNameAlreadyExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            traineeRepository.create(trainee);
+
+            Trainee newTrainee = Trainee.builder().firstName("Jack").lastName("Robertson").userName(userName)
+                    .passwordHash("jack").isActive(true).dateOfBirth(LocalDate.of(1995, 12, 1)).address("USA").build();
+
+            Exception exc = assertThrows(ConstraintViolationException.class,
+                    () -> traineeRepository.create(newTrainee));
+            assertTrue(exc.getMessage().contains("duplicate key value violates unique constraint"));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.setRollbackOnly();
+        }
+    }
+
 }
