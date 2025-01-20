@@ -416,4 +416,102 @@ class TrainerRepositoryImplTest {
         }
     }
 
+    @Test
+    void updateShouldUpdateEntity_ifSuchEntityExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            String userName = "Jack.Powell";
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName(userName)
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            trainer.setSpecialization(TrainingType.builder().id(5L).build());
+            trainer.setPasswordHash("powell");
+            trainerRepository.update(trainer);
+
+            Optional<Trainer> foundTrainer = trainerRepository.findById(trainer.getId());
+
+            assertTrue(foundTrainer.isPresent());
+            assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName());
+            assertEquals(trainer.getLastName(), foundTrainer.get().getLastName());
+            assertEquals(trainer.getUserName(), foundTrainer.get().getUserName());
+            assertEquals(trainer.getPasswordHash(), foundTrainer.get().getPasswordHash());
+            assertEquals(trainer.isActive(), foundTrainer.get().isActive());
+            assertEquals(trainer.getSpecialization().getId(), foundTrainer.get().getSpecialization().getId());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldCreateEntity_ifSuchEntityDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            String userName = "Jack.Powell";
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName(userName)
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.update(trainer);
+
+            Optional<Trainer> foundTrainer = trainerRepository.findById(trainer.getId());
+
+            assertTrue(foundTrainer.isPresent());
+            assertEquals(trainer.getFirstName(), foundTrainer.get().getFirstName());
+            assertEquals(trainer.getLastName(), foundTrainer.get().getLastName());
+            assertEquals(trainer.getUserName(), foundTrainer.get().getUserName());
+            assertEquals(trainer.getPasswordHash(), foundTrainer.get().getPasswordHash());
+            assertEquals(trainer.isActive(), foundTrainer.get().isActive());
+            assertEquals(trainer.getSpecialization().getId(), foundTrainer.get().getSpecialization().getId());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldThrowException_ifEntityWithSuchUserNameAlreadyExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            String userName = "Jack.Powell";
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName(userName)
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            Trainer newTrainer = trainerRepository
+                    .create(Trainer.builder().firstName("Jack").lastName("Robertson").userName("Jack.Robertson")
+                            .passwordHash("jack").isActive(true).specialization(trainingType).build());
+
+            newTrainer.setUserName(userName);
+            Exception exc = assertThrows(ConstraintViolationException.class, () -> {
+                trainerRepository.update(newTrainer);
+                entityManager.flush();
+            });
+            assertTrue(exc.getMessage().contains("duplicate key value violates unique constraint"));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.setRollbackOnly();
+        }
+    }
+
 }
