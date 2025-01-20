@@ -29,7 +29,6 @@ import com.streamlined.springhibernatetask.entity.TrainingType;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
 
@@ -54,7 +53,7 @@ class TrainerRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainer.class, entityManager);
 
             assertEquals(0L, Utilities.stream(trainerRepository.findAll()).count());
         } catch (Exception e) {
@@ -63,14 +62,6 @@ class TrainerRepositoryImplTest {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
         }
-    }
-
-    private int deleteAll(EntityManager entityManager) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaDelete<Trainer> criteria = cb.createCriteriaDelete(Trainer.class);
-        criteria.from(Trainer.class);
-        Query query = entityManager.createQuery(criteria);
-        return query.executeUpdate();
     }
 
     @Test
@@ -91,7 +82,7 @@ class TrainerRepositoryImplTest {
             Set<String> expectedEntityKeys = expectedEntityList.stream().map(this::getTrainerKey)
                     .collect(Collectors.toSet());
 
-            deleteAll(entityManager);
+            deleteAll(Trainer.class, entityManager);
             saveAll(expectedEntityList);
 
             Set<String> actualEntityKeys = Utilities.stream(trainerRepository.findAll()).map(this::getTrainerKey)
@@ -124,7 +115,7 @@ class TrainerRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainer.class, entityManager);
 
             String nonExistingUserName = "John.Smith";
             Optional<Trainer> trainer = trainerRepository.findByUserName(nonExistingUserName);
@@ -145,7 +136,7 @@ class TrainerRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainer.class, entityManager);
             String existingUserName = "John.Smith";
             Trainer trainer = Trainer.builder().firstName("John").lastName("Smith").userName(existingUserName)
                     .passwordHash("john").isActive(true).specialization(TrainingType.builder().id(7L).build()).build();
@@ -170,7 +161,9 @@ class TrainerRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
             TrainingType trainingType = TrainingType.builder().id(9L).name("Chemistry").build();
             String traineeName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(traineeName)
@@ -203,6 +196,72 @@ class TrainerRepositoryImplTest {
     private String getTrainingKey(Training a) {
         return "%d%d%d%s%d%tF%s".formatted(a.getId(), a.getTrainee().getId(), a.getTrainer().getId(), a.getName(),
                 a.getType().getId(), a.getDate(), a.getDuration().toString());
+    }
+
+    @Test
+    void getNonAssignedTrainers_shouldReturnListOfTraining_ifSucceeds() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
+
+            TrainingType trainingType1 = TrainingType.builder().id(1L).build();
+            Trainer trainer1 = Trainer.builder().firstName("John").lastName("Smith").userName("John.Smith")
+                    .passwordHash("john").isActive(true).specialization(trainingType1).build();
+            TrainingType trainingType2 = TrainingType.builder().id(3L).build();
+            Trainer trainer2 = Trainer.builder().firstName("Jack").lastName("Powell").userName("Jack.Powell")
+                    .passwordHash("jack").isActive(true).specialization(trainingType2).build();
+            TrainingType trainingType3 = TrainingType.builder().id(5L).build();
+            Trainer trainer3 = Trainer.builder().firstName("Robert").lastName("Orwell").userName("Robert.Orwell")
+                    .passwordHash("robert").isActive(false).specialization(trainingType3).build();
+            List<Trainer> trainerList = List.of(trainer1, trainer2, trainer3);
+            saveAll(trainerList);
+
+            String traineeName = "Ken.Harmful";
+            Trainee trainee = Trainee.builder().firstName("Ken").lastName("Harmful").userName(traineeName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+            String otherTraineeName = "Jenny.Welsh";
+            Trainee otherTrainee = Trainee.builder().firstName("Jenny").lastName("Welsh").userName(otherTraineeName)
+                    .passwordHash("jenny").isActive(true).dateOfBirth(LocalDate.of(1996, 1, 1)).address("Canada")
+                    .build();
+            otherTrainee = traineeRepository.create(otherTrainee);
+
+            Training training1 = Training.builder().trainee(otherTrainee).trainer(trainer1).name("Art")
+                    .type(trainingType1).date(LocalDate.of(2024, 1, 1)).duration(Duration.of(1L, ChronoUnit.DAYS))
+                    .build();
+            training1 = trainingRepository.create(training1);
+            Training training2 = Training.builder().trainee(trainee).trainer(trainer2).name("Geography")
+                    .type(trainingType2).date(LocalDate.of(2024, 2, 1)).duration(Duration.of(1L, ChronoUnit.DAYS))
+                    .build();
+            training2 = trainingRepository.create(training2);
+            Training training3 = Training.builder().trainee(trainee).trainer(trainer3).name("Computers")
+                    .type(trainingType3).date(LocalDate.of(2024, 3, 1)).duration(Duration.of(1L, ChronoUnit.DAYS))
+                    .build();
+            training3 = trainingRepository.create(training3);
+
+            Set<String> trainerKeys = Utilities.stream(trainerRepository.getNonAssignedTrainers(traineeName))
+                    .map(this::getTrainerKey).collect(Collectors.toSet());
+
+            assertEquals(1, trainerKeys.size());
+            assertEquals(getTrainerKey(trainer1), trainerKeys.iterator().next());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.setRollbackOnly();
+        }
+    }
+
+    private <T> int deleteAll(Class<T> entityClass, EntityManager entityManager) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<T> criteria = cb.createCriteriaDelete(entityClass);
+        criteria.from(entityClass);
+        return entityManager.createQuery(criteria).executeUpdate();
     }
 
 }

@@ -28,7 +28,6 @@ import com.streamlined.springhibernatetask.entity.TrainingType;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaDelete;
 
@@ -53,7 +52,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
 
             assertEquals(0L, Utilities.stream(traineeRepository.findAll()).count());
         } catch (Exception e) {
@@ -64,12 +63,11 @@ class TraineeRepositoryImplTest {
         }
     }
 
-    private int deleteAll(EntityManager entityManager) {
+    private <T> int deleteAll(Class<T> entityClass, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaDelete<Trainee> criteria = cb.createCriteriaDelete(Trainee.class);
-        criteria.from(Trainee.class);
-        Query query = entityManager.createQuery(criteria);
-        return query.executeUpdate();
+        CriteriaDelete<T> criteria = cb.createCriteriaDelete(entityClass);
+        criteria.from(entityClass);
+        return entityManager.createQuery(criteria).executeUpdate();
     }
 
     @Test
@@ -90,7 +88,7 @@ class TraineeRepositoryImplTest {
             Set<String> expectedEntityKeys = expectedEntityList.stream().map(this::getTraineeKey)
                     .collect(Collectors.toSet());
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             saveAll(expectedEntityList);
 
             Set<String> actualEntityKeys = Utilities.stream(traineeRepository.findAll()).map(this::getTraineeKey)
@@ -123,7 +121,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
 
             String nonExistingUserName = "John.Smith";
             Optional<Trainee> trainee = traineeRepository.findByUserName(nonExistingUserName);
@@ -144,7 +142,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String existingUserName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(existingUserName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -169,7 +167,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String existingUserName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(existingUserName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -199,7 +197,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -225,7 +223,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
 
             Long nonExistingId = -1L;
             Optional<Trainee> trainee = traineeRepository.findById(nonExistingId);
@@ -246,7 +244,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
 
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
@@ -272,7 +270,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
 
             Long nonExistingId = -1L;
             traineeRepository.deleteById(nonExistingId);
@@ -293,7 +291,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName("John.Smith")
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
             trainee = traineeRepository.create(trainee);
@@ -320,7 +318,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName("John.Smith")
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
             trainee = traineeRepository.create(trainee);
@@ -344,7 +342,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -371,7 +369,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -407,7 +405,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -439,7 +437,7 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
             String userName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
                     .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
@@ -470,7 +468,9 @@ class TraineeRepositoryImplTest {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            deleteAll(entityManager);
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
             TrainingType trainingType = TrainingType.builder().id(9L).name("Chemistry").build();
             String traineeName = "John.Smith";
             Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(traineeName)
