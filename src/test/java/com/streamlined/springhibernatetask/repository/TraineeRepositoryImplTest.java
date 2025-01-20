@@ -352,4 +352,103 @@ class TraineeRepositoryImplTest {
         }
     }
 
+    @Test
+    void updateShouldUpdateEntity_ifSuchEntityExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            trainee.setDateOfBirth(LocalDate.of(1991, 2, 1));
+            trainee.setAddress("Canada");
+            trainee.setPasswordHash("smith");
+            traineeRepository.update(trainee);
+
+            Optional<Trainee> foundTrainee = traineeRepository.findById(trainee.getId());
+
+            assertTrue(foundTrainee.isPresent());
+            assertEquals(trainee.getFirstName(), foundTrainee.get().getFirstName());
+            assertEquals(trainee.getLastName(), foundTrainee.get().getLastName());
+            assertEquals(trainee.getUserName(), foundTrainee.get().getUserName());
+            assertEquals(trainee.getPasswordHash(), foundTrainee.get().getPasswordHash());
+            assertEquals(trainee.isActive(), foundTrainee.get().isActive());
+            assertEquals(trainee.getDateOfBirth(), foundTrainee.get().getDateOfBirth());
+            assertEquals(trainee.getAddress(), foundTrainee.get().getAddress());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldCreateEntity_ifSuchEntityDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+
+            trainee = traineeRepository.update(trainee);
+
+            Optional<Trainee> foundTrainee = traineeRepository.findById(trainee.getId());
+
+            assertTrue(foundTrainee.isPresent());
+            assertEquals(trainee.getFirstName(), foundTrainee.get().getFirstName());
+            assertEquals(trainee.getLastName(), foundTrainee.get().getLastName());
+            assertEquals(trainee.getUserName(), foundTrainee.get().getUserName());
+            assertEquals(trainee.getPasswordHash(), foundTrainee.get().getPasswordHash());
+            assertEquals(trainee.isActive(), foundTrainee.get().isActive());
+            assertEquals(trainee.getDateOfBirth(), foundTrainee.get().getDateOfBirth());
+            assertEquals(trainee.getAddress(), foundTrainee.get().getAddress());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldThrowException_ifEntityWithSuchUserNameAlreadyExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            Trainee newTrainee = traineeRepository.create(Trainee.builder().firstName("Jack").lastName("Robertson")
+                    .userName("Jack.Robertson").passwordHash("jack").isActive(true)
+                    .dateOfBirth(LocalDate.of(1995, 12, 1)).address("USA").build());
+
+            newTrainee.setUserName(userName);
+            Exception exc = assertThrows(ConstraintViolationException.class, () -> {
+                traineeRepository.update(newTrainee);
+                entityManager.flush();
+            });
+            assertTrue(exc.getMessage().contains("duplicate key value violates unique constraint"));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.setRollbackOnly();
+        }
+    }
+
 }
