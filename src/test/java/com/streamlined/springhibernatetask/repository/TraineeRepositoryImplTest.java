@@ -253,28 +253,50 @@ class TraineeRepositoryImplTest {
     }
 
     @Test
-    void testGetTrainingListByUserNameDateRangeTrainerNameType() {
-        fail("Not yet implemented"); // TODO
+    void deleteByIdShouldDoNothing_ifEntityWithPassedIdDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            Long nonExistingId = -1L;
+            traineeRepository.deleteById(nonExistingId);
+
+            assertTrue(isEmptyTable());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
     }
 
     @Test
-    void testDeleteByUserName() {
-        fail("Not yet implemented"); // TODO
+    void deleteByIdShouldDeleteEntityWithPassedId_ifSuchEntityExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName("John.Smith")
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            traineeRepository.deleteById(trainee.getId());
+
+            assertTrue(isEmptyTable());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
     }
 
-    @Test
-    void testSave() {
-        fail("Not yet implemented"); // TODO
+    private boolean isEmptyTable() {
+        return !traineeRepository.findAll().iterator().hasNext();
     }
-
-    @Test
-    void testFindById() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testDeleteById() {
-        fail("Not yet implemented"); // TODO
-    }
-
 }
