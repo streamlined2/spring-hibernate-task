@@ -68,12 +68,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     }
 
     @Override
-    public Trainee save(Trainee trainee) {
-        EntityManager entityManager = entityManagerStorage.getEntityManager();
-        return entityManager.merge(trainee);
-    }
-
-    @Override
     public Optional<Trainee> findById(Long id) {
         EntityManager entityManager = entityManagerStorage.getEntityManager();
         return Optional.ofNullable(entityManager.find(Trainee.class, id));
@@ -84,6 +78,19 @@ public class TraineeRepositoryImpl implements TraineeRepository {
         EntityManager entityManager = entityManagerStorage.getEntityManager();
         Trainee trainee = entityManager.getReference(Trainee.class, id);
         entityManager.remove(trainee);
+    }
+
+    @Override
+    public Trainee create(Trainee trainee) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        entityManager.persist(trainee);
+        return trainee;
+    }
+
+    @Override
+    public Trainee update(Trainee trainee) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        return entityManager.merge(trainee);
     }
 
 }

@@ -38,7 +38,7 @@ public class TrainingServiceImpl implements TrainingService {
             Training training = trainingMapper.toEntity(dto);
             transaction = entityManager.getTransaction();
             transaction.begin();
-            Training savedTraining = trainingRepository.save(training);
+            Training savedTraining = trainingRepository.create(training);
             transaction.commit();
             return trainingMapper.toDto(savedTraining);
         } catch (Exception e) {

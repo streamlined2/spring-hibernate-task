@@ -71,12 +71,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     }
 
     @Override
-    public Trainer save(Trainer trainer) {
-        EntityManager entityManager = entityManagerStorage.getEntityManager();
-        return entityManager.merge(trainer);
-    }
-
-    @Override
     public Optional<Trainer> findById(Long id) {
         EntityManager entityManager = entityManagerStorage.getEntityManager();
         return Optional.ofNullable(entityManager.find(Trainer.class, id));
@@ -87,6 +81,19 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         EntityManager entityManager = entityManagerStorage.getEntityManager();
         Trainer trainer = entityManager.getReference(Trainer.class, id);
         entityManager.remove(trainer);
+    }
+
+    @Override
+    public Trainer create(Trainer trainer) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        entityManager.persist(trainer);
+        return trainer;
+    }
+
+    @Override
+    public Trainer update(Trainer trainer) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        return entityManager.merge(trainer);
     }
 
 }

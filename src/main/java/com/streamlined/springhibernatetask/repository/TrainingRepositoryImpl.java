@@ -25,15 +25,22 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    public Training save(Training training) {
-        EntityManager entityManager = entityManagerStorage.getEntityManager();
-        return entityManager.merge(training);
-    }
-
-    @Override
     public Optional<Training> findById(Long id) {
         EntityManager entityManager = entityManagerStorage.getEntityManager();
         return Optional.ofNullable(entityManager.find(Training.class, id));
+    }
+
+    @Override
+    public Training create(Training training) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        entityManager.persist(training);
+        return training;
+    }
+
+    @Override
+    public Training update(Training training) {
+        EntityManager entityManager = entityManagerStorage.getEntityManager();
+        return entityManager.merge(training);
     }
 
 }

@@ -8,7 +8,9 @@ public interface TrainingRepository {
 
     Iterable<Training> findAll();
 
-    Training save(Training training);
+    Training create(Training training);
+
+    Training update(Training training);
 
     Optional<Training> findById(Long id);
 

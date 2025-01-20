@@ -51,7 +51,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             transaction = entityManager.getTransaction();
             transaction.begin();
             setNextUsernameSerial(trainer);
-            Trainer createdTrainer = trainerRepository.save(trainer);
+            Trainer createdTrainer = trainerRepository.create(trainer);
             transaction.commit();
             securityService.clearPassword(password);
             return trainerMapper.toDto(createdTrainer);
@@ -88,7 +88,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
                     .orElseThrow(() -> new NoSuchEntityException("No trainer entity with id %d".formatted(dto.id())));
             newTrainer.setPasswordHash(trainer.getPasswordHash());
             newTrainer.setUserName(trainer.getUserName());
-            Trainer savedTrainer = trainerRepository.save(newTrainer);
+            Trainer savedTrainer = trainerRepository.update(newTrainer);
             transaction.commit();
             return trainerMapper.toDto(savedTrainer);
         } catch (Exception e) {
@@ -108,7 +108,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             Trainer trainer = trainerRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainer entity with id %d".formatted(id)));
             trainer.setPasswordHash(securityService.getPasswordHash(password));
-            Trainer updatedTrainer = trainerRepository.save(trainer);
+            Trainer updatedTrainer = trainerRepository.update(trainer);
             transaction.commit();
             securityService.clearPassword(password);
             return trainerMapper.toDto(updatedTrainer);
@@ -174,7 +174,7 @@ public class TrainerServiceImpl extends UserServiceImpl implements TrainerServic
             transaction.begin();
             Trainer trainer = trainerRepository.findById(id).map(this::changeUserStatus)
                     .orElseThrow(() -> new NoSuchEntityException("No trainer entity with id %d".formatted(id)));
-            Trainer savedTrainer = trainerRepository.save(trainer);
+            Trainer savedTrainer = trainerRepository.update(trainer);
             transaction.commit();
             return savedTrainer.isActive();
         } catch (Exception e) {

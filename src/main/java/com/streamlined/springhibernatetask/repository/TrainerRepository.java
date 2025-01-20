@@ -17,7 +17,9 @@ public interface TrainerRepository {
 
     Iterable<Trainer> getNonAssignedTrainers(String traineeUserName);
 
-    Trainer save(Trainer trainer);
+    Trainer create(Trainer trainer);
+
+    Trainer update(Trainer trainer);
 
     Optional<Trainer> findById(Long userId);
 

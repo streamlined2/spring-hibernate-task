@@ -52,7 +52,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             transaction = entityManager.getTransaction();
             transaction.begin();
             setNextUsernameSerial(trainee);
-            Trainee createdTrainee = traineeRepository.save(trainee);
+            Trainee createdTrainee = traineeRepository.create(trainee);
             transaction.commit();
             securityService.clearPassword(password);
             return traineeMapper.toDto(createdTrainee);
@@ -89,7 +89,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(dto.id())));
             newTrainee.setPasswordHash(trainee.getPasswordHash());
             newTrainee.setUserName(trainee.getUserName());
-            Trainee savedTrainee = traineeRepository.save(newTrainee);
+            Trainee savedTrainee = traineeRepository.update(newTrainee);
             transaction.commit();
             return traineeMapper.toDto(savedTrainee);
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             Trainee trainee = traineeRepository.findById(id)
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(id)));
             trainee.setPasswordHash(securityService.getPasswordHash(password));
-            Trainee updatedTrainee = traineeRepository.save(trainee);
+            Trainee updatedTrainee = traineeRepository.update(trainee);
             transaction.commit();
             securityService.clearPassword(password);
             return traineeMapper.toDto(updatedTrainee);
@@ -191,7 +191,7 @@ public class TraineeServiceImpl extends UserServiceImpl implements TraineeServic
             transaction.begin();
             Trainee trainee = traineeRepository.findById(id).map(this::changeUserStatus)
                     .orElseThrow(() -> new NoSuchEntityException("No trainee entity with id %d".formatted(id)));
-            Trainee savedTrainee = traineeRepository.save(trainee);
+            Trainee savedTrainee = traineeRepository.update(trainee);
             transaction.commit();
             return savedTrainee.isActive();
         } catch (Exception e) {

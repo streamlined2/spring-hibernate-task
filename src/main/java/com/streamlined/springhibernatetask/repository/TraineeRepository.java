@@ -18,7 +18,9 @@ public interface TraineeRepository {
 
     void deleteByUserName(String userName);
 
-    Trainee save(Trainee trainee);
+    Trainee create(Trainee trainee);
+
+    Trainee update(Trainee trainee);
 
     Optional<Trainee> findById(Long id);
 
