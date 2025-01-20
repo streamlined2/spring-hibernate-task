@@ -173,4 +173,107 @@ class TrainingRepositoryImplTest {
         }
     }
 
+    @Test
+    void createShouldCreateNewEntity_ifSucceeds() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
+
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = trainerRepository.create(Trainer.builder().firstName("John").lastName("Smith")
+                    .userName("John.Smith").passwordHash("john").isActive(true).specialization(trainingType).build());
+            Trainee trainee = traineeRepository.create(
+                    Trainee.builder().firstName("Ken").lastName("Harmful").userName("Ken.Harmful").passwordHash("ken")
+                            .isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build());
+            Training training = trainingRepository
+                    .create(Training.builder().trainee(trainee).trainer(trainer).name("Art").type(trainingType)
+                            .date(LocalDate.of(2024, 1, 1)).duration(Duration.of(1L, ChronoUnit.DAYS)).build());
+
+            Optional<Training> foundTraining = trainingRepository.findById(training.getId());
+
+            assertTrue(foundTraining.isPresent());
+            assertEquals(getTrainingKey(training), getTrainingKey(foundTraining.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldUpdateEntity_ifSuchEntityExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
+
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = trainerRepository.create(Trainer.builder().firstName("John").lastName("Smith")
+                    .userName("John.Smith").passwordHash("john").isActive(true).specialization(trainingType).build());
+            Trainee trainee = traineeRepository.create(
+                    Trainee.builder().firstName("Ken").lastName("Harmful").userName("Ken.Harmful").passwordHash("ken")
+                            .isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build());
+            Training training = trainingRepository
+                    .create(Training.builder().trainee(trainee).trainer(trainer).name("Art").type(trainingType)
+                            .date(LocalDate.of(2024, 1, 1)).duration(Duration.of(1L, ChronoUnit.DAYS)).build());
+
+            training.setDate(LocalDate.of(2023, 12, 1));
+            training.setDuration(Duration.of(2L, ChronoUnit.DAYS));
+            trainingRepository.update(training);
+
+            Optional<Training> foundTraining = trainingRepository.findById(training.getId());
+
+            assertTrue(foundTraining.isPresent());
+            assertEquals(getTrainingKey(training), getTrainingKey(foundTraining.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void updateShouldCreateEntity_ifSuchEntityDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainee.class, entityManager);
+            deleteAll(Trainer.class, entityManager);
+            deleteAll(Training.class, entityManager);
+
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = trainerRepository.create(Trainer.builder().firstName("John").lastName("Smith")
+                    .userName("John.Smith").passwordHash("john").isActive(true).specialization(trainingType).build());
+            Trainee trainee = traineeRepository.create(
+                    Trainee.builder().firstName("Ken").lastName("Harmful").userName("Ken.Harmful").passwordHash("ken")
+                            .isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build());
+            Training training = trainingRepository
+                    .update(Training.builder().trainee(trainee).trainer(trainer).name("Art").type(trainingType)
+                            .date(LocalDate.of(2024, 1, 1)).duration(Duration.of(1L, ChronoUnit.DAYS)).build());
+
+            Optional<Training> foundTraining = trainingRepository.findById(training.getId());
+
+            assertTrue(foundTraining.isPresent());
+            assertEquals(getTrainingKey(training), getTrainingKey(foundTraining.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
 }

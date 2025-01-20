@@ -28,11 +28,6 @@ class TraineeServiceImplTest {
     private TraineeMapper traineeMapper;
 
     @Test
-    void testCreateTraineeDtoCharArray() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
     void testCreateTraineeDto() {
         Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").passwordHash("john").isActive(true)
                 .dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA New-York, First Avenue st., 10").build();
@@ -45,51 +40,6 @@ class TraineeServiceImplTest {
         assertNotNull(response.password());
 
         traineeService.deleteById(response.id());
-    }
-
-    @Test
-    void testUpdate() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testUpdatePassword() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testDeleteById() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testDeleteByUserName() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testFindById() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testFindAll() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testFindByUserName() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testChangeActiveStatus() {
-        fail("Not yet implemented"); // TODO
-    }
-
-    @Test
-    void testGetTrainingListByUserNameDateRangeTrainerNameType() {
-        fail("Not yet implemented"); // TODO
     }
 
 }
