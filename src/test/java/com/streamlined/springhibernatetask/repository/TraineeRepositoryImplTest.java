@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,32 @@ class TraineeRepositoryImplTest {
     private TraineeRepositoryImpl traineeRepository;
 
     @Test
+    void findAllShouldReturnEmptyList_ifTraineeTableContainsNoData() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            assertEquals(0L, Utilities.stream(traineeRepository.findAll()).count());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    private int deleteAll(EntityManager entityManager) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Trainee> criteria = cb.createCriteriaDelete(Trainee.class);
+        criteria.from(Trainee.class);
+        Query query = entityManager.createQuery(criteria);
+        return query.executeUpdate();
+    }
+
+    @Test
     void findAllShouldReturnListOfAllAvailableTraineeEntities_ifSucceeds() {
         EntityTransaction transaction = null;
         try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
@@ -52,7 +79,7 @@ class TraineeRepositoryImplTest {
             Set<String> expectedEntityKeys = expectedEntityList.stream().map(this::getTraineeKey)
                     .collect(Collectors.toSet());
 
-            int count = deleteAll(entityManager);
+            deleteAll(entityManager);
             saveAll(expectedEntityList);
 
             Set<String> actualEntityKeys = Utilities.stream(traineeRepository.findAll()).map(this::getTraineeKey)
@@ -71,22 +98,55 @@ class TraineeRepositoryImplTest {
         trainees.forEach(traineeRepository::create);
     }
 
-    private int deleteAll(EntityManager entityManager) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaDelete<Trainee> criteria = cb.createCriteriaDelete(Trainee.class);
-        criteria.from(Trainee.class);
-        Query query = entityManager.createQuery(criteria);
-        return query.executeUpdate();
-    }
-
     private String getTraineeKey(Trainee a) {
         return "%s%s%s%s%b%tF%s".formatted(a.getFirstName(), a.getLastName(), a.getUserName(), a.getPasswordHash(),
                 a.isActive(), a.getDateOfBirth(), a.getAddress());
     }
 
     @Test
-    void testFindByUserName() {
-        fail("Not yet implemented"); // TODO
+    void findByUserNameShouldReturnEmptyOptional_ifPassedUserNameDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            String nonExistingUserName = "John.Smith";
+            Optional<Trainee> trainee = traineeRepository.findByUserName(nonExistingUserName);
+
+            assertTrue(trainee.isEmpty());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void findByUserNameShouldReturnFoundTrainee_ifPassedUserNameExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+            String existingUserName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(existingUserName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            Optional<Trainee> foundTrainee = traineeRepository.findByUserName(existingUserName);
+
+            assertTrue(foundTrainee.isPresent());
+            assertEquals(getTraineeKey(trainee), getTraineeKey(foundTrainee.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
     }
 
     @Test
