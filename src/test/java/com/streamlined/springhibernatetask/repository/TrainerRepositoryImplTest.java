@@ -311,4 +311,53 @@ class TrainerRepositoryImplTest {
         }
     }
 
+    @Test
+    void deleteByIdShouldDoNothing_ifEntityWithPassedIdDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+
+            Long nonExistingId = -1L;
+            trainerRepository.deleteById(nonExistingId);
+
+            assertTrue(isEmptyTable());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void deleteByIdShouldDeleteEntityWithPassedId_ifSuchEntityExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(Trainer.class, entityManager);
+            TrainingType trainingType = TrainingType.builder().id(3L).build();
+            Trainer trainer = Trainer.builder().firstName("Jack").lastName("Powell").userName("Jack.Powell")
+                    .passwordHash("jack").isActive(true).specialization(trainingType).build();
+            trainer = trainerRepository.create(trainer);
+
+            trainerRepository.deleteById(trainer.getId());
+
+            assertTrue(isEmptyTable());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+        }
+    }
+
+    private boolean isEmptyTable() {
+        return !trainerRepository.findAll().iterator().hasNext();
+    }
+
 }
