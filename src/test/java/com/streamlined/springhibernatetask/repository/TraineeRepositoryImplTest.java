@@ -206,6 +206,53 @@ class TraineeRepositoryImplTest {
     }
 
     @Test
+    void findByIdShouldReturnEmptyTraineeEntity_ifEntityWithPassedIdDoesNotExist() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            Long nonExistingId = -1L;
+            Optional<Trainee> trainee = traineeRepository.findById(nonExistingId);
+
+            assertTrue(trainee.isEmpty());
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    @Test
+    void findByIdShouldReturnFoundTraineeEntity_ifEntityWithPassedIdExists() {
+        EntityTransaction transaction = null;
+        try (EntityManager entityManager = entityManagerStorage.getEntityManager()) {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            deleteAll(entityManager);
+
+            String userName = "John.Smith";
+            Trainee trainee = Trainee.builder().firstName("John").lastName("Smith").userName(userName)
+                    .passwordHash("john").isActive(true).dateOfBirth(LocalDate.of(1990, 1, 1)).address("USA").build();
+            trainee = traineeRepository.create(trainee);
+
+            Optional<Trainee> foundTrainee = traineeRepository.findById(trainee.getId());
+
+            assertTrue(foundTrainee.isPresent());
+            assertEquals(getTraineeKey(trainee), getTraineeKey(foundTrainee.get()));
+        } catch (Exception e) {
+            fail("Exception executing test: ", e);
+        } finally {
+            if (transaction != null)
+                transaction.rollback();
+        }
+    }
+
+    @Test
     void testGetTrainingListByUserNameDateRangeTrainerNameType() {
         fail("Not yet implemented"); // TODO
     }
