@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+						http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+	<changeSet author="streamlined" id="002. create user_table">
+		<createTable tableName="user_table">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"
+					unique="true" />
+			</column>
+			<column name="first_name" type="varchar(255)">
+				<constraints nullable="false"
+					checkConstraint="length(trim(first_name))>=3" />
+			</column>
+			<column name="last_name" type="varchar(255)">
+				<constraints nullable="false"
+					checkConstraint="length(trim(last_name))>=3" />
+			</column>
+			<column name="user_name" type="varchar(255)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="password_hash" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="is_active" type="boolean"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addUniqueConstraint tableName="user_table"
+			columnNames="user_name" />
+	</changeSet>
+</databaseChangeLog>
